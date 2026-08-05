@@ -85,10 +85,17 @@ so they don't each duplicate that wiring.
 Handwriting recognition (`src/lib/ocr/rasterize.ts`, `src/lib/tpx/inference.ts`,
 `src/scripts/ocr.ts`) rasterizes each page with `supernote-typescript`'s
 `toImage`, flattens it onto white (pages are stored transparent), and sends
-it as a vision chat-completion request to whichever model under the current
-TPX grant advertises vision support. "Convert Handwriting to Text with AI" in
-the viewer toolbar runs it page by page and shows the result alongside the note
-preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
+it as a vision chat-completion request to the model picked in Settings'
+"Model" dropdown. That dropdown (`populateModels()` in `tpx-login.ts`) is
+populated from `GET {resource}/models` once TPX connects - every model the
+provider actually offers (filtered to the grant's own model restriction, if
+it has one), not just vision-capable ones, so "what models do I even have"
+is answered directly rather than hidden behind an automatic pick; ones whose
+description mentions vision are labeled `(vision)` and one of those is
+preselected by default via `pickVisionModel()`. "Convert Handwriting to Text
+with AI" in the viewer toolbar runs recognition page by page against
+whichever model is currently selected and shows the result alongside the
+note preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
 
 Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
 redirects to `/`; every page checks it via a synchronous inline script in

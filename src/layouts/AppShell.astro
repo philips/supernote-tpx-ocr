@@ -57,6 +57,11 @@ const base = import.meta.env.BASE_URL;
 						<button id="tpx-disconnect" hidden>Disconnect</button>
 						<p id="tpx-status">Not connected.</p>
 
+						<label for="tpx-model">Model</label>
+						<select id="tpx-model" disabled>
+							<option value="">Connect to see available models</option>
+						</select>
+
 						<details class="prompt-details">
 							<summary>Recognition prompt</summary>
 							<textarea id="tpx-prompt" rows="6">{DEFAULT_PROMPT}</textarea>

@@ -1,4 +1,4 @@
-import { loadGrant, saveGrant, listModels, pickVisionModel, recognizePageText, DEFAULT_PROMPT } from '../lib/tpx';
+import { loadGrant, saveGrant, recognizePageText, DEFAULT_PROMPT } from '../lib/tpx';
 import { parseNote, rasterizePageToDataUrl } from '../lib/ocr/rasterize';
 import { NOTE_LOADED_EVENT, getCurrentNote } from './note-events';
 import { setSidebarOpen } from './sidebar-toggle';
@@ -12,6 +12,7 @@ const ocrStatusEl = document.getElementById('ocr-status') as HTMLElement;
 const ocrResultEl = document.getElementById('ocr-result') as HTMLElement;
 const ocrTextEl = document.getElementById('ocr-text') as HTMLElement;
 const promptEl = document.getElementById('tpx-prompt') as HTMLTextAreaElement;
+const modelSelect = document.getElementById('tpx-model') as HTMLSelectElement;
 
 let running = false;
 
@@ -44,6 +45,14 @@ async function runOcr(): Promise<void> {
     return;
   }
 
+  const model = modelSelect.value;
+  if (!model) {
+    setSidebarOpen(true);
+    dispatchOpenSettings();
+    setOcrStatus('No model selected - check Settings.', 'warning');
+    return;
+  }
+
   running = true;
   updateAvailability();
   downloadButton.hidden = true;
@@ -53,9 +62,6 @@ async function runOcr(): Promise<void> {
   try {
     const note = parseNote(currentNote.bytes);
     const pageCount = note.pages.length;
-    setOcrStatus('Loading model list…');
-    const models = await listModels(grant.resource);
-    const model = pickVisionModel(models, grant.models);
     const prompt = promptEl.value.trim() || DEFAULT_PROMPT;
 
     const pageTexts: string[] = [];
