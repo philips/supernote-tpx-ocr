@@ -1,6 +1,6 @@
 import { loadGrant, saveGrant, listModels, pickVisionModel, recognizePageText, DEFAULT_PROMPT } from '../lib/tpx';
 import { parseNote, rasterizePageToDataUrl } from '../lib/ocr/rasterize';
-import { NOTE_LOADED_EVENT, type NoteLoadedDetail } from './note-events';
+import { NOTE_LOADED_EVENT, getCurrentNote } from './note-events';
 import { setSidebarOpen } from './sidebar-toggle';
 import { dispatchOpenSettings } from './sidebar-tabs';
 
@@ -11,7 +11,6 @@ const ocrResultEl = document.getElementById('ocr-result') as HTMLElement;
 const ocrTextEl = document.getElementById('ocr-text') as HTMLElement;
 const promptEl = document.getElementById('tpx-prompt') as HTMLTextAreaElement;
 
-let currentNote: NoteLoadedDetail | null = null;
 let running = false;
 
 function baseName(path: string): string {
@@ -28,10 +27,11 @@ function setOcrStatus(text: string, level: StatusLevel = 'info'): void {
 }
 
 function updateAvailability(): void {
-  runButton.disabled = running || !currentNote;
+  runButton.disabled = running || !getCurrentNote();
 }
 
 async function runOcr(): Promise<void> {
+  const currentNote = getCurrentNote();
   if (!currentNote) return;
 
   let grant = loadGrant();
@@ -83,6 +83,7 @@ function downloadTxt(): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
+  const currentNote = getCurrentNote();
   link.download = `${currentNote ? baseName(currentNote.path) : 'note'}-tpx-ocr.txt`;
   link.click();
   URL.revokeObjectURL(url);
@@ -91,8 +92,7 @@ function downloadTxt(): void {
 runButton.addEventListener('click', () => void runOcr());
 downloadButton.addEventListener('click', downloadTxt);
 
-window.addEventListener(NOTE_LOADED_EVENT, (e) => {
-  currentNote = (e as CustomEvent<NoteLoadedDetail>).detail;
+window.addEventListener(NOTE_LOADED_EVENT, () => {
   ocrResultEl.hidden = true;
   downloadButton.hidden = true;
   setOcrStatus('');

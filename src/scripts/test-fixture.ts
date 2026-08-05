@@ -1,16 +1,10 @@
-import { dispatchNoteLoaded } from './note-events';
-
-interface SupernoteViewerElement extends HTMLElement {
-  noteData: ArrayBuffer | Uint8Array | null;
-}
+import { loadNoteIntoViewer } from './note-events';
 
 const FIXTURE_PATH = `${import.meta.env.BASE_URL}fixtures/rtr.note`;
 const FIXTURE_NAME = 'rtr.note';
 
 const loadButton = document.getElementById('load-fixture') as HTMLButtonElement;
 const statusEl = document.getElementById('status') as HTMLElement;
-const emptyStateEl = document.getElementById('empty-state') as HTMLElement;
-const viewerEl = document.getElementById('viewer') as SupernoteViewerElement;
 
 async function loadFixture(): Promise<void> {
   loadButton.disabled = true;
@@ -19,10 +13,7 @@ async function loadFixture(): Promise<void> {
     const res = await fetch(FIXTURE_PATH);
     if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
     const bytes = new Uint8Array(await res.arrayBuffer());
-    viewerEl.noteData = bytes;
-    emptyStateEl.hidden = true;
-    viewerEl.hidden = false;
-    dispatchNoteLoaded({ path: FIXTURE_NAME, bytes });
+    loadNoteIntoViewer({ path: FIXTURE_NAME, bytes });
     statusEl.textContent = `Loaded ${FIXTURE_NAME} (${bytes.byteLength.toLocaleString()} bytes).`;
   } catch (err) {
     statusEl.textContent = `Failed to load fixture: ${(err as Error).message}`;
