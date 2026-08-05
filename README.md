@@ -53,6 +53,16 @@ handling. The sidebar's "TPX" panel lets you point at any provider that
 advertises the `llm-inference` grant type — tokenpony.dev by default, or a
 self-hosted one.
 
+Connecting TPX is a full-page redirect away and back (the provider's own
+sign-in page), which would otherwise drop whatever `.note` file was loaded
+in memory. `src/scripts/note-cache.ts` stashes the current note in
+IndexedDB (not `sessionStorage` - a real device capture can run several MB,
+past what `sessionStorage` reliably holds as a base64 string) right before
+redirecting, and `tpx-login.ts`'s `init()` restores it on the way back.
+`src/scripts/note-events.ts` centralizes "load a note into the viewer" for
+every source (device browser, upload, test fixture, and this restore path)
+so they don't each duplicate that wiring.
+
 Handwriting recognition (`src/lib/ocr/rasterize.ts`, `src/lib/tpx/inference.ts`,
 `src/scripts/ocr.ts`) rasterizes each page with `supernote-typescript`'s
 `toImage`, flattens it onto white (pages are stored transparent), and sends

@@ -10,6 +10,8 @@ import {
   startAuthorization,
   type StoredGrant,
 } from '../lib/tpx';
+import { getCurrentNote, loadNoteIntoViewer } from './note-events';
+import { saveNoteForRedirect, takeNoteForRedirect } from './note-cache';
 
 const providerInput = document.getElementById('tpx-provider') as HTMLInputElement;
 const budgetInput = document.getElementById('tpx-budget') as HTMLInputElement;
@@ -82,6 +84,10 @@ async function connect(): Promise<void> {
     const discovered = await discoverProvider(providerOrigin);
     statusEl.textContent = 'Registering client…';
     const clientId = await ensureClientId(discovered.as, redirectUri());
+
+    const currentNote = getCurrentNote();
+    if (currentNote) await saveNoteForRedirect(currentNote);
+
     statusEl.textContent = 'Redirecting to sign in…';
     await startAuthorization({ discovered, clientId, redirectUri: redirectUri(), budget });
   } catch (err) {
@@ -109,6 +115,9 @@ connectButton.addEventListener('click', () => void connect());
 disconnectButton.addEventListener('click', () => void disconnect());
 
 async function init(): Promise<void> {
+  const restoredNote = await takeNoteForRedirect();
+  if (restoredNote) loadNoteIntoViewer(restoredNote);
+
   try {
     const fresh = await completeAuthorizationFromUrl();
     if (fresh) {

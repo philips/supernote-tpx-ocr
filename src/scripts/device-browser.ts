@@ -7,18 +7,12 @@ import {
   type MtpDevice,
   type ObjectInfo,
 } from '../lib/mtp-ts';
-import { dispatchNoteLoaded } from './note-events';
-
-interface SupernoteViewerElement extends HTMLElement {
-  noteData: ArrayBuffer | Uint8Array | null;
-}
+import { loadNoteIntoViewer } from './note-events';
 
 const connectButton = document.getElementById('connect') as HTMLButtonElement;
 const statusEl = document.getElementById('status') as HTMLElement;
 const crumbsEl = document.getElementById('crumbs') as HTMLElement;
 const listingEl = document.getElementById('listing') as HTMLElement;
-const emptyStateEl = document.getElementById('empty-state') as HTMLElement;
-const viewerEl = document.getElementById('viewer') as SupernoteViewerElement;
 
 let mtp: MtpDevice | null = null;
 let fs: MtpFs | null = null;
@@ -126,10 +120,7 @@ async function previewNote(notePath: string): Promise<void> {
   setStatus(`Loading ${notePath}…`);
   try {
     const bytes = await fs.readFile(notePath);
-    viewerEl.noteData = bytes;
-    emptyStateEl.hidden = true;
-    viewerEl.hidden = false;
-    dispatchNoteLoaded({ path: notePath, bytes });
+    loadNoteIntoViewer({ path: notePath, bytes });
     setStatus(`/${path || ''}`);
   } catch (err) {
     setStatus(`Failed to load ${notePath}: ${(err as Error).message}`);
