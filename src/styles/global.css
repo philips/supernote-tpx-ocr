@@ -375,3 +375,16 @@ td a:hover {
 	padding-left: 1.25rem;
 	line-height: 1.6;
 }
+
+/* No-AI mode: applied to <html> by a synchronous inline script in
+   AppShell.astro's <head> (before first paint, so there's no flash of
+   TPX/OCR UI) whenever localStorage's noai flag is set. The matching
+   scripts (tpx-login.ts, ocr.ts) skip wiring themselves up entirely in
+   this mode, not just hiding these elements - see isNoAiMode() in
+   src/scripts/noai.ts. */
+.noai #sidebar-tabs,
+.noai #settings-panel,
+.noai #viewer-toolbar,
+.noai #ocr-result {
+	display: none !important;
+}

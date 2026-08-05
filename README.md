@@ -32,10 +32,16 @@ pull request and on push to `main`.
 
 `/` (`src/pages/index.astro`, `src/scripts/device-browser.ts`) is the device file
 browser; it needs a Chromium-based browser (WebUSB) and a Supernote plugged in
-over USB. Browsers without WebUSB (Safari, notably) can't use it — `/`'s
-sidebar also has an "Upload" section (`src/scripts/upload-note.ts`) that loads
-a `.note` file picked from disk straight into the same viewer + recognition
-pipeline, no device connection needed. `/test` (`src/pages/test.astro`,
+over USB. Each file row has a download button (⬇, reads it via `MtpFs.readFile`
+and saves it locally), and the "Upload to this folder" picker writes a local
+file into the currently-browsed device folder via `MtpFs.writeFile` (creates
+parent folders as needed, deletes any same-named file first - MTP has no
+in-place overwrite). Browsers without WebUSB (Safari, notably) can't use any
+of that — `/`'s sidebar also has a separate "Upload" section
+(`src/scripts/upload-note.ts`) that loads a `.note` file picked from disk
+straight into the viewer + recognition pipeline instead, no device connection
+needed (this one only loads into the browser - it doesn't write to a device).
+`/test` (`src/pages/test.astro`,
 `src/scripts/test-fixture.ts`) is a similar no-device path, but loads a bundled
 test fixture (`public/fixtures/rtr.note`, from `supernote-typescript`'s own
 test suite) instead of a user-picked file, for trying the rasterize →
@@ -75,6 +81,19 @@ it as a vision chat-completion request to whichever model under the current
 TPX grant advertises vision support. "Convert Handwriting to Text with AI" in
 the viewer toolbar runs it page by page and shows the result alongside the note
 preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
+
+Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
+redirects to `/`; every page checks it via a synchronous inline script in
+`<head>` (`src/layouts/AppShell.astro`, before first paint, so there's no
+flash of TPX/OCR UI) that adds a `noai` class to `<html>`. CSS hides the
+Settings tab, the OCR toolbar, and the OCR result panel whenever that class
+is present, and `tpx-login.ts`/`ocr.ts` check `isNoAiMode()`
+(`src/lib/noai.ts`) to skip wiring themselves up at all in that case - not
+just hiding controls, but making sure no TPX/inference network request
+(discovery, introspection, refresh) can happen for someone who explicitly
+asked not to send anything to a third party. The footer link toggles: it
+reads "No AI / TPX-free mode" normally, or "Enable AI features" (clearing
+the flag) once that mode is already on.
 
 ## Deployment
 

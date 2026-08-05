@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { DEFAULT_PROMPT } from '../lib/tpx/inference';
+import { NOAI_STORAGE_KEY } from '../lib/noai';
 
 export interface Props {
   title?: string;
@@ -18,6 +19,11 @@ const base = import.meta.env.BASE_URL;
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<script is:inline define:vars={{ key: NOAI_STORAGE_KEY }}>
+			if (localStorage.getItem(key) === '1') {
+				document.documentElement.classList.add('noai');
+			}
+		</script>
 		<script type="module" src={`${base}vendor/supernote-viewer.js`} is:inline></script>
 	</head>
 	<body>
@@ -76,6 +82,8 @@ const base = import.meta.env.BASE_URL;
 			<a href="https://github.com/philips/supernote-tpx-ocr" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
 			<span aria-hidden="true">·</span>
 			<a href="https://github.com/philips/supernote-tpx-ocr/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">AGPL-3.0-or-later</a>
+			<span aria-hidden="true">·</span>
+			<a id="noai-link" href={`${base}noai/`}>No AI / TPX-free mode</a>
 		</footer>
 
 		<dialog id="welcome-dialog">
@@ -98,6 +106,7 @@ const base = import.meta.env.BASE_URL;
 
 		<script src="../scripts/sidebar-toggle.ts"></script>
 		<script src="../scripts/sidebar-tabs.ts"></script>
+		<script src="../scripts/noai.ts"></script>
 		<script src="../scripts/tpx-login.ts"></script>
 		<script src="../scripts/welcome.ts"></script>
 		<slot />

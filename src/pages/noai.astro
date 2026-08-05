@@ -1,0 +1,19 @@
+---
+import { NOAI_STORAGE_KEY } from '../lib/noai';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Supernote USB MTP Viewer — No AI</title>
+		<script is:inline define:vars={{ key: NOAI_STORAGE_KEY, base }}>
+			localStorage.setItem(key, '1');
+			window.location.replace(base);
+		</script>
+	</head>
+	<body>
+		<p>Turning off AI/TPX features…</p>
+	</body>
+</html>
