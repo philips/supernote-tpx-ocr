@@ -8,7 +8,7 @@ export interface ModelInfo {
 
 const VISION_HINT = /vision/i;
 
-const DEFAULT_PROMPT = [
+export const DEFAULT_PROMPT = [
   'Transcribe all handwritten and printed text visible in this image exactly as written.',
   'Preserve line breaks between distinct lines of writing.',
   'Output only the transcribed text, with no commentary, headers, or descriptions of the image.',

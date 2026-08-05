@@ -26,13 +26,17 @@ bun run build   # static build to dist/
 
 `/` (`src/pages/index.astro`, `src/scripts/device-browser.ts`) is the device file
 browser; it needs a Chromium-based browser (WebUSB) and a Supernote plugged in
-over USB. `/test` (`src/pages/test.astro`, `src/scripts/test-fixture.ts`) is a
-no-device path that loads a bundled test fixture (`public/fixtures/rtr.note`,
-from `supernote-typescript`'s own test suite) straight into the same viewer +
-recognition pipeline, for trying the rasterize → TPX-recognize flow without a
-Supernote on hand. Both pages share `src/layouts/AppShell.astro` (topbar, TPX
-panel, viewer pane) and the `tpx-login.ts`/`ocr.ts` scripts; only the sidebar's
-source panel and its loader script differ.
+over USB. Browsers without WebUSB (Safari, notably) can't use it — `/`'s
+sidebar also has an "Upload" section (`src/scripts/upload-note.ts`) that loads
+a `.note` file picked from disk straight into the same viewer + recognition
+pipeline, no device connection needed. `/test` (`src/pages/test.astro`,
+`src/scripts/test-fixture.ts`) is a similar no-device path, but loads a bundled
+test fixture (`public/fixtures/rtr.note`, from `supernote-typescript`'s own
+test suite) instead of a user-picked file, for trying the rasterize →
+TPX-recognize flow without a Supernote on hand. All three sources feed the
+same `note-loaded` event (`src/scripts/note-events.ts`) that `ocr.ts` listens
+for. `/` and `/test` share `src/layouts/AppShell.astro` (topbar, TPX panel,
+viewer pane); only the sidebar's source panel(s) and loader script(s) differ.
 
 TPX login (`src/lib/tpx/`, `src/scripts/tpx-login.ts`) implements the
 [TPX v0.3 OAuth profile](https://tokenpony.dev/spec) as a public,

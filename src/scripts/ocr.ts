@@ -1,4 +1,4 @@
-import { loadGrant, saveGrant, listModels, pickVisionModel, recognizePageText } from '../lib/tpx';
+import { loadGrant, saveGrant, listModels, pickVisionModel, recognizePageText, DEFAULT_PROMPT } from '../lib/tpx';
 import { parseNote, rasterizePageToDataUrl } from '../lib/ocr/rasterize';
 import { NOTE_LOADED_EVENT, type NoteLoadedDetail } from './note-events';
 import { TPX_GRANT_CHANGED_EVENT } from './tpx-events';
@@ -8,6 +8,7 @@ const downloadButton = document.getElementById('download-txt') as HTMLButtonElem
 const ocrStatusEl = document.getElementById('ocr-status') as HTMLElement;
 const ocrResultEl = document.getElementById('ocr-result') as HTMLElement;
 const ocrTextEl = document.getElementById('ocr-text') as HTMLElement;
+const promptEl = document.getElementById('tpx-prompt') as HTMLTextAreaElement;
 
 let currentNote: NoteLoadedDetail | null = null;
 let running = false;
@@ -37,12 +38,13 @@ async function runOcr(): Promise<void> {
     ocrStatusEl.textContent = 'Loading model list…';
     const models = await listModels(grant.resource);
     const model = pickVisionModel(models, grant.models);
+    const prompt = promptEl.value.trim() || DEFAULT_PROMPT;
 
     const pageTexts: string[] = [];
     for (let page = 1; page <= pageCount; page++) {
       ocrStatusEl.textContent = `Recognizing page ${page} of ${pageCount} (${model})…`;
       const imageDataUrl = await rasterizePageToDataUrl(note, page);
-      const result = await recognizePageText({ grant, model, imageDataUrl });
+      const result = await recognizePageText({ grant, model, imageDataUrl, prompt });
       grant = result.grant;
       saveGrant(grant);
       pageTexts.push(`## Page ${page}\n\n${result.text.trim()}`);

@@ -4,14 +4,27 @@ import AppShell from '../layouts/AppShell.astro';
 
 <AppShell>
 	<Fragment slot="source-panel">
-		<h2>Device</h2>
-		<div id="toolbar">
-			<button id="connect">Connect device</button>
-		</div>
-		<div id="crumbs"></div>
-		<div id="status">Click "Connect device" to get started.</div>
-		<div id="listing"></div>
+		<section class="sidebar-section">
+			<h2>Device</h2>
+			<div id="toolbar">
+				<button id="connect">Connect device</button>
+			</div>
+			<div id="crumbs"></div>
+			<div id="status">Click "Connect device" to get started.</div>
+			<div id="listing"></div>
+		</section>
+
+		<section class="sidebar-section">
+			<h2>Upload</h2>
+			<p class="panel-note">
+				Can't connect a device? (Safari and some other browsers don't support WebUSB.) Upload a
+				<code>.note</code> file directly instead.
+			</p>
+			<input id="upload-note" type="file" accept=".note" />
+			<p id="upload-status" class="panel-note"></p>
+		</section>
 	</Fragment>
 
 	<script src="../scripts/device-browser.ts"></script>
+	<script src="../scripts/upload-note.ts"></script>
 </AppShell>
