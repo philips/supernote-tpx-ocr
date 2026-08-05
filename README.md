@@ -11,6 +11,26 @@ Enrich and improve your Supernote handwriting recognition without installing any
 
 ## Roadmap
 
-- [ ] Web based file browser of Supernote device using supernote viewer web component and mtp-ts
+- [x] Web based file browser of Supernote device using supernote viewer web component and mtp-ts
 - [ ] TPX login for users to access their LLM
 - [ ] Rasterizes .note files, uploads to LLM with prompt to recognize handwriting, and writes recognized text back to a new note named <orig>-tpx-ocr.note with https://github.com/philips/supernote-typescript and uploaded to device over MTP
+
+## Development
+
+```sh
+bun install
+bun run dev     # dev server
+bun run build   # static build to dist/
+```
+
+The device file browser (`src/pages/index.astro`, `src/scripts/device-browser.ts`)
+needs a Chromium-based browser (WebUSB) and a Supernote plugged in over USB.
+
+## License
+
+AGPL-3.0-or-later. This project vendors [`mtp-ts`](https://github.com/polvi/yolorepo/tree/main/mtp-ts)
+(AGPL-3.0-or-later, by Alex Polvi) and a build of
+[`<supernote-viewer>`](https://github.com/philips/supernote-obsidian-plugin) (MIT,
+which itself links the GPL-3.0-or-later `supernote-typescript`) — see the
+`NOTICE.md` files next to each vendored copy in `src/lib/mtp-ts/` and
+`public/vendor/` for details and provenance.

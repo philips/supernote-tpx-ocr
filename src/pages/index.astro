@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Supernote TPX OCR</title>
+		<script type="module" src="/vendor/supernote-viewer.js" is:inline></script>
+	</head>
+	<body>
+		<header>
+			<h1>Supernote TPX OCR</h1>
+			<p>
+				Browse your Supernote device over USB and preview <code>.note</code> files, all client-side.
+			</p>
+		</header>
+
+		<main>
+			<div id="toolbar">
+				<button id="connect">Connect device</button>
+			</div>
+			<div id="crumbs"></div>
+			<div id="status">Click "Connect device" to get started.</div>
+
+			<div id="browser">
+				<div id="listing"></div>
+				<div id="preview" hidden>
+					<supernote-viewer id="viewer" style="height: 70vh; display: block;"></supernote-viewer>
+				</div>
+			</div>
+		</main>
+
+		<script src="../scripts/device-browser.ts"></script>
+	</body>
+</html>
