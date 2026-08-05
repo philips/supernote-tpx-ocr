@@ -55,7 +55,7 @@ export async function ensureClientId(as: AuthorizationServerMetadata, redirectUr
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      client_name: 'Supernote TPX OCR',
+      client_name: 'Supernote USB MTP Viewer and AI Handwriting to Text',
       redirect_uris: [redirectUri],
       token_endpoint_auth_method: 'none',
     }),

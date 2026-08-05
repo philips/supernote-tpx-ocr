@@ -51,8 +51,8 @@ Handwriting recognition (`src/lib/ocr/rasterize.ts`, `src/lib/tpx/inference.ts`,
 `src/scripts/ocr.ts`) rasterizes each page with `supernote-typescript`'s
 `toImage`, flattens it onto white (pages are stored transparent), and sends
 it as a vision chat-completion request to whichever model under the current
-TPX grant advertises vision support. "Recognize handwriting" in the viewer
-toolbar runs it page by page and shows the result alongside the note
+TPX grant advertises vision support. "Convert Handwriting to Text with AI" in
+the viewer toolbar runs it page by page and shows the result alongside the note
 preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
 
 ## Deployment

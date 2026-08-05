@@ -6,7 +6,7 @@ export interface Props {
   title?: string;
 }
 
-const { title = 'Supernote TPX OCR' } = Astro.props;
+const { title = 'Supernote USB MTP Viewer and AI Handwriting to Text' } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -58,7 +58,7 @@ const base = import.meta.env.BASE_URL;
 
 			<main id="viewer-pane">
 				<div id="viewer-toolbar">
-					<button id="run-ocr" disabled>Recognize handwriting</button>
+					<button id="run-ocr" disabled>Convert Handwriting to Text with AI</button>
 					<span id="ocr-status"></span>
 					<button id="download-txt" hidden>Download .txt</button>
 				</div>
@@ -73,7 +73,7 @@ const base = import.meta.env.BASE_URL;
 		</div>
 
 		<dialog id="welcome-dialog">
-			<h2>Supernote TPX OCR</h2>
+			<h2>Supernote USB MTP Viewer and AI Handwriting to Text</h2>
 			<p>
 				Recognize handwriting from your Supernote <code>.note</code> files, entirely in your
 				browser - no app to install, no server of ours in the middle.
