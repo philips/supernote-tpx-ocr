@@ -13,28 +13,42 @@ import '../styles/global.css';
 		<script type="module" src="/vendor/supernote-viewer.js" is:inline></script>
 	</head>
 	<body>
-		<header>
+		<div id="topbar">
+			<button id="menu-toggle" aria-label="Toggle file browser" aria-expanded="true" aria-controls="sidebar">☰</button>
 			<h1>Supernote TPX OCR</h1>
-			<p>
-				Browse your Supernote device over USB and preview <code>.note</code> files, all client-side.
-			</p>
-		</header>
+		</div>
 
-		<main>
-			<div id="toolbar">
-				<button id="connect">Connect device</button>
-			</div>
-			<div id="crumbs"></div>
-			<div id="status">Click "Connect device" to get started.</div>
+		<div id="app">
+			<aside id="sidebar">
+				<section id="tpx-panel" class="sidebar-section">
+					<h2>TPX</h2>
+					<label for="tpx-provider">Provider</label>
+					<input id="tpx-provider" type="url" value="https://api.tokenpony.dev" />
+					<label for="tpx-budget">Budget (USD)</label>
+					<input id="tpx-budget" type="number" min="0.01" step="0.01" value="0.10" />
+					<button id="tpx-connect">Connect TPX</button>
+					<button id="tpx-disconnect" hidden>Disconnect</button>
+					<p id="tpx-status">Not connected.</p>
+				</section>
 
-			<div id="browser">
-				<div id="listing"></div>
-				<div id="preview" hidden>
-					<supernote-viewer id="viewer" style="height: 70vh; display: block;"></supernote-viewer>
-				</div>
-			</div>
-		</main>
+				<section class="sidebar-section">
+					<h2>Device</h2>
+					<div id="toolbar">
+						<button id="connect">Connect device</button>
+					</div>
+					<div id="crumbs"></div>
+					<div id="status">Click "Connect device" to get started.</div>
+					<div id="listing"></div>
+				</section>
+			</aside>
 
+			<main id="viewer-pane">
+				<p id="empty-state">Select a <code>.note</code> file from the menu to preview it here.</p>
+				<supernote-viewer id="viewer" hidden></supernote-viewer>
+			</main>
+		</div>
+
+		<script src="../scripts/tpx-login.ts"></script>
 		<script src="../scripts/device-browser.ts"></script>
 	</body>
 </html>

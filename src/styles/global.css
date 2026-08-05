@@ -5,6 +5,7 @@
 	--muted: #666;
 	--border: #ddd;
 	--accent: #2563eb;
+	--sidebar-width: 320px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,18 +21,113 @@
 	box-sizing: border-box;
 }
 
+html,
+body {
+	height: 100%;
+}
+
 body {
 	font: 16px/1.5 system-ui, sans-serif;
 	color: var(--fg);
 	background: var(--bg);
 	margin: 0;
-	padding: 1.5rem;
-	max-width: 60rem;
-	margin-inline: auto;
+	display: flex;
+	flex-direction: column;
 }
 
-header p {
+#topbar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.6rem 1rem;
+	border-bottom: 1px solid var(--border);
+	flex: none;
+}
+
+#topbar h1 {
+	font-size: 1.1rem;
+	margin: 0;
+}
+
+#menu-toggle {
+	font: inherit;
+	font-size: 1.1rem;
+	line-height: 1;
+	background: none;
+	color: var(--fg);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 0.4rem 0.6rem;
+	cursor: pointer;
+}
+
+#app {
+	flex: 1;
+	display: flex;
+	min-height: 0;
+}
+
+#sidebar {
+	width: var(--sidebar-width);
+	flex: none;
+	border-right: 1px solid var(--border);
+	padding: 1rem;
+	overflow-y: auto;
+	transition: margin-left 0.15s ease, opacity 0.15s ease;
+}
+
+#sidebar.collapsed {
+	margin-left: calc(-1 * var(--sidebar-width));
+	opacity: 0;
+	pointer-events: none;
+}
+
+.sidebar-section {
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.sidebar-section h2 {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 	color: var(--muted);
+	margin: 0 0 0.6rem;
+}
+
+.sidebar-section label {
+	display: block;
+	font-size: 0.85rem;
+	color: var(--muted);
+	margin: 0.5rem 0 0.2rem;
+}
+
+.sidebar-section input {
+	font: inherit;
+	width: 100%;
+	background: var(--bg);
+	color: var(--fg);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 0.4rem 0.5rem;
+}
+
+.sidebar-section button {
+	margin-top: 0.75rem;
+	width: 100%;
+}
+
+#tpx-status {
+	color: var(--muted);
+	font-size: 0.9rem;
+	margin: 0.6rem 0 0;
 }
 
 #toolbar {
@@ -91,6 +187,29 @@ td a:hover {
 	text-decoration: underline;
 }
 
-#preview {
-	margin-top: 1.5rem;
+#viewer-pane {
+	flex: 1;
+	min-width: 0;
+	padding: 1rem;
+	overflow: auto;
+	display: flex;
+}
+
+#empty-state {
+	margin: auto;
+	color: var(--muted);
+}
+
+#viewer-pane supernote-viewer {
+	flex: 1;
+	display: block;
+	/* The component's :host has no `overflow` of its own (stays `visible`),
+	   so as a flex item its automatic min-width/min-height would otherwise
+	   be content-based instead of 0. Without this override, a page zoomed
+	   even slightly past the available width stops the host from shrinking
+	   back down, which grows the very .pages width the component's own
+	   "fit width" logic measures on its next pass - an unbounded zoom
+	   feedback loop (flexbugs #3, applied to the host element itself). */
+	min-width: 0;
+	min-height: 0;
 }

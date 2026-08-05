@@ -16,8 +16,10 @@ const connectButton = document.getElementById('connect') as HTMLButtonElement;
 const statusEl = document.getElementById('status') as HTMLElement;
 const crumbsEl = document.getElementById('crumbs') as HTMLElement;
 const listingEl = document.getElementById('listing') as HTMLElement;
-const previewEl = document.getElementById('preview') as HTMLElement;
+const emptyStateEl = document.getElementById('empty-state') as HTMLElement;
 const viewerEl = document.getElementById('viewer') as SupernoteViewerElement;
+const menuToggle = document.getElementById('menu-toggle') as HTMLButtonElement;
+const sidebarEl = document.getElementById('sidebar') as HTMLElement;
 
 let mtp: MtpDevice | null = null;
 let fs: MtpFs | null = null;
@@ -110,7 +112,6 @@ async function navigate(newPath: string): Promise<void> {
   if (!fs) return;
   path = newPath;
   renderCrumbs();
-  previewEl.hidden = true;
   setStatus(`Loading /${path}…`);
   try {
     const entries = await fs.readdir(path);
@@ -127,11 +128,17 @@ async function previewNote(notePath: string): Promise<void> {
   try {
     const bytes = await fs.readFile(notePath);
     viewerEl.noteData = bytes;
-    previewEl.hidden = false;
+    emptyStateEl.hidden = true;
+    viewerEl.hidden = false;
     setStatus(`/${path || ''}`);
   } catch (err) {
     setStatus(`Failed to load ${notePath}: ${(err as Error).message}`);
   }
+}
+
+function setSidebarOpen(open: boolean): void {
+  sidebarEl.classList.toggle('collapsed', !open);
+  menuToggle.setAttribute('aria-expanded', String(open));
 }
 
 async function connect(): Promise<void> {
@@ -160,6 +167,9 @@ async function connect(): Promise<void> {
 }
 
 connectButton.addEventListener('click', () => void connect());
+menuToggle.addEventListener('click', () => {
+  setSidebarOpen(sidebarEl.classList.contains('collapsed'));
+});
 
 if (!usbSupported()) {
   setStatus('WebUSB is not available in this browser. Use Chrome, Edge, or another Chromium browser.');
