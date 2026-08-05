@@ -22,7 +22,13 @@ Enrich and improve your Supernote handwriting recognition without installing any
 bun install
 bun run dev     # dev server
 bun run build   # static build to dist/
+bun run check   # astro check (typecheck)
+bun run lint    # eslint
+bun run test    # vitest run
 ```
+
+`.github/workflows/ci.yml` runs all four (lint, check, test, build) on every
+pull request and on push to `main`.
 
 `/` (`src/pages/index.astro`, `src/scripts/device-browser.ts`) is the device file
 browser; it needs a Chromium-based browser (WebUSB) and a Supernote plugged in
