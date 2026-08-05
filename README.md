@@ -51,7 +51,12 @@ client registration (RFC 7591, cached per provider in `localStorage`), a
 PAR + PKCE(S256) authorization request, code exchange, and rotating-refresh
 handling. The sidebar's "TPX" panel lets you point at any provider that
 advertises the `llm-inference` grant type — tokenpony.dev by default, or a
-self-hosted one.
+self-hosted one. tokenpony.dev specifically uses a pre-registered `client_id`
+(`KNOWN_CLIENTS` in `src/lib/tpx/client.ts`) scoped to this app's actual
+production redirect URIs (`https://supernote.ifup.org/` and `.../test/`), so
+visitors to the deployed site don't each silently self-register a fresh
+throwaway client - anything else (local dev, a fork, a self-hosted provider)
+still dynamically registers itself as before.
 
 Handwriting recognition (`src/lib/ocr/rasterize.ts`, `src/lib/tpx/inference.ts`,
 `src/scripts/ocr.ts`) rasterizes each page with `supernote-typescript`'s
