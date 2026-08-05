@@ -198,6 +198,10 @@ body {
 	margin: 0 0 0.75rem;
 }
 
+.panel-note a {
+	color: var(--accent);
+}
+
 .sidebar-section button {
 	margin-top: 0.75rem;
 	width: 100%;
