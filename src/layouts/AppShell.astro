@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+}
+
+const { title = 'Supernote TPX OCR' } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<script type="module" src="/vendor/supernote-viewer.js" is:inline></script>
+	</head>
+	<body>
+		<div id="topbar">
+			<button id="menu-toggle" aria-label="Toggle file browser" aria-expanded="true" aria-controls="sidebar">☰</button>
+			<h1>{title}</h1>
+		</div>
+
+		<div id="app">
+			<aside id="sidebar">
+				<section id="tpx-panel" class="sidebar-section">
+					<h2>TPX</h2>
+					<label for="tpx-provider">Provider</label>
+					<input id="tpx-provider" type="url" value="https://api.tokenpony.dev" />
+					<label for="tpx-budget">Budget (USD)</label>
+					<input id="tpx-budget" type="number" min="0.01" step="0.01" value="0.10" />
+					<button id="tpx-connect">Connect TPX</button>
+					<button id="tpx-disconnect" hidden>Disconnect</button>
+					<p id="tpx-status">Not connected.</p>
+				</section>
+
+				<section class="sidebar-section">
+					<slot name="source-panel" />
+				</section>
+			</aside>
+
+			<main id="viewer-pane">
+				<div id="viewer-toolbar">
+					<button id="run-ocr" disabled>Recognize handwriting</button>
+					<span id="ocr-status"></span>
+					<button id="download-txt" hidden>Download .txt</button>
+				</div>
+				<div id="viewer-body">
+					<p id="empty-state">Select a <code>.note</code> file from the menu to preview it here.</p>
+					<supernote-viewer id="viewer" hidden></supernote-viewer>
+					<div id="ocr-result" hidden>
+						<pre id="ocr-text"></pre>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script src="../scripts/sidebar-toggle.ts"></script>
+		<script src="../scripts/tpx-login.ts"></script>
+		<slot />
+		<script src="../scripts/ocr.ts"></script>
+	</body>
+</html>

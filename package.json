@@ -13,7 +13,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.1.6"
+    "astro": "^7.1.6",
+    "image-js": "^1.7.0",
+    "supernote-typescript": "^0.5.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

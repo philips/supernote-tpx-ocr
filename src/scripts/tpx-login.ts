@@ -10,6 +10,7 @@ import {
   startAuthorization,
   type StoredGrant,
 } from '../lib/tpx';
+import { dispatchTpxGrantChanged } from './tpx-events';
 
 const providerInput = document.getElementById('tpx-provider') as HTMLInputElement;
 const budgetInput = document.getElementById('tpx-budget') as HTMLInputElement;
@@ -34,6 +35,7 @@ function renderConnected(grant: StoredGrant, remaining?: number): void {
     ? formatUsd(grant.budget)
     : `${formatUsd(remaining)} of ${formatUsd(grant.budget)}`;
   statusEl.textContent = `Connected to ${new URL(grant.issuer).host} — ${budgetText} remaining`;
+  dispatchTpxGrantChanged();
 }
 
 function renderDisconnected(message = 'Not connected.'): void {
@@ -43,6 +45,7 @@ function renderDisconnected(message = 'Not connected.'): void {
   budgetInput.disabled = false;
   disconnectButton.hidden = true;
   statusEl.textContent = message;
+  dispatchTpxGrantChanged();
 }
 
 async function refreshStatus(grant: StoredGrant): Promise<void> {

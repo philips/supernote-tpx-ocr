@@ -7,6 +7,7 @@ import {
   type MtpDevice,
   type ObjectInfo,
 } from '../lib/mtp-ts';
+import { dispatchNoteLoaded } from './note-events';
 
 interface SupernoteViewerElement extends HTMLElement {
   noteData: ArrayBuffer | Uint8Array | null;
@@ -18,8 +19,6 @@ const crumbsEl = document.getElementById('crumbs') as HTMLElement;
 const listingEl = document.getElementById('listing') as HTMLElement;
 const emptyStateEl = document.getElementById('empty-state') as HTMLElement;
 const viewerEl = document.getElementById('viewer') as SupernoteViewerElement;
-const menuToggle = document.getElementById('menu-toggle') as HTMLButtonElement;
-const sidebarEl = document.getElementById('sidebar') as HTMLElement;
 
 let mtp: MtpDevice | null = null;
 let fs: MtpFs | null = null;
@@ -130,15 +129,11 @@ async function previewNote(notePath: string): Promise<void> {
     viewerEl.noteData = bytes;
     emptyStateEl.hidden = true;
     viewerEl.hidden = false;
+    dispatchNoteLoaded({ path: notePath, bytes });
     setStatus(`/${path || ''}`);
   } catch (err) {
     setStatus(`Failed to load ${notePath}: ${(err as Error).message}`);
   }
-}
-
-function setSidebarOpen(open: boolean): void {
-  sidebarEl.classList.toggle('collapsed', !open);
-  menuToggle.setAttribute('aria-expanded', String(open));
 }
 
 async function connect(): Promise<void> {
@@ -167,9 +162,6 @@ async function connect(): Promise<void> {
 }
 
 connectButton.addEventListener('click', () => void connect());
-menuToggle.addEventListener('click', () => {
-  setSidebarOpen(sidebarEl.classList.contains('collapsed'));
-});
 
 if (!usbSupported()) {
   setStatus('WebUSB is not available in this browser. Use Chrome, Edge, or another Chromium browser.');
