@@ -1,0 +1,315 @@
+:root {
+	color-scheme: light dark;
+	--fg: #1a1a1a;
+	--bg: #ffffff;
+	--muted: #666;
+	--border: #ddd;
+	--accent: #2563eb;
+	--sidebar-width: 320px;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--fg: #e5e5e5;
+		--bg: #14161a;
+		--muted: #9aa0a6;
+		--border: #2a2d33;
+	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	font: 16px/1.5 system-ui, sans-serif;
+	color: var(--fg);
+	background: var(--bg);
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+#topbar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.6rem 1rem;
+	border-bottom: 1px solid var(--border);
+	flex: none;
+}
+
+#topbar h1 {
+	font-size: 1.1rem;
+	margin: 0;
+}
+
+#menu-toggle {
+	font: inherit;
+	font-size: 1.1rem;
+	line-height: 1;
+	background: none;
+	color: var(--fg);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 0.4rem 0.6rem;
+	cursor: pointer;
+}
+
+#app {
+	flex: 1;
+	display: flex;
+	min-height: 0;
+}
+
+#sidebar {
+	width: var(--sidebar-width);
+	flex: none;
+	border-right: 1px solid var(--border);
+	padding: 1rem;
+	overflow-y: auto;
+	transition: margin-left 0.15s ease, opacity 0.15s ease;
+}
+
+#sidebar.collapsed {
+	margin-left: calc(-1 * var(--sidebar-width));
+	opacity: 0;
+	pointer-events: none;
+}
+
+.sidebar-section {
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.sidebar-section h2 {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--muted);
+	margin: 0 0 0.6rem;
+}
+
+.sidebar-section label {
+	display: block;
+	font-size: 0.85rem;
+	color: var(--muted);
+	margin: 0.5rem 0 0.2rem;
+}
+
+.sidebar-section input,
+.sidebar-section textarea {
+	font: inherit;
+	width: 100%;
+	background: var(--bg);
+	color: var(--fg);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 0.4rem 0.5rem;
+}
+
+.sidebar-section textarea {
+	font-size: 0.85rem;
+	resize: vertical;
+}
+
+.prompt-details {
+	margin-top: 0.75rem;
+}
+
+.prompt-details summary {
+	font-size: 0.85rem;
+	color: var(--muted);
+	cursor: pointer;
+	user-select: none;
+}
+
+.prompt-details textarea {
+	margin-top: 0.4rem;
+}
+
+.panel-note {
+	font-size: 0.85rem;
+	color: var(--muted);
+	margin: 0 0 0.75rem;
+}
+
+.sidebar-section button {
+	margin-top: 0.75rem;
+	width: 100%;
+}
+
+#tpx-status {
+	color: var(--muted);
+	font-size: 0.9rem;
+	margin: 0.6rem 0 0;
+}
+
+#toolbar {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+button {
+	font: inherit;
+	background: var(--accent);
+	color: #fff;
+	border: 0;
+	border-radius: 6px;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+}
+
+button:disabled {
+	background: var(--muted);
+	cursor: default;
+}
+
+#crumbs a {
+	color: var(--accent);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+#crumbs a:hover {
+	text-decoration: underline;
+}
+
+#status {
+	color: var(--muted);
+	margin: 0.75rem 0;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td {
+	padding: 0.35rem 0.5rem 0.35rem 0;
+	border-bottom: 1px solid var(--border);
+}
+
+td a {
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+td a:hover {
+	text-decoration: underline;
+}
+
+#viewer-pane {
+	flex: 1;
+	min-width: 0;
+	padding: 1rem;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+#viewer-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex: none;
+}
+
+#viewer-toolbar button {
+	width: auto;
+}
+
+#ocr-status {
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+#viewer-body {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	gap: 1rem;
+}
+
+#empty-state {
+	margin: auto;
+	color: var(--muted);
+}
+
+#viewer-body supernote-viewer {
+	flex: 1;
+	display: block;
+	/* The component's :host has no `overflow` of its own (stays `visible`),
+	   so as a flex item its automatic min-width/min-height would otherwise
+	   be content-based instead of 0. Without this override, a page zoomed
+	   even slightly past the available width stops the host from shrinking
+	   back down, which grows the very .pages width the component's own
+	   "fit width" logic measures on its next pass - an unbounded zoom
+	   feedback loop (flexbugs #3, applied to the host element itself). */
+	min-width: 0;
+	min-height: 0;
+}
+
+#ocr-result {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--bg);
+}
+
+#ocr-text {
+	margin: 0;
+	padding: 0.75rem;
+	white-space: pre-wrap;
+	font: 13px/1.5 ui-monospace, SFMono-Regular, monospace;
+}
+
+#welcome-dialog {
+	max-width: 32rem;
+	width: calc(100% - 2rem);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 1.5rem;
+	background: var(--bg);
+	color: var(--fg);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+#welcome-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+#welcome-dialog h2 {
+	margin: 0 0 0.75rem;
+	font-size: 1.15rem;
+}
+
+#welcome-dialog p {
+	margin: 0 0 0.75rem;
+	line-height: 1.5;
+}
+
+#welcome-dialog ol {
+	margin: 0 0 0.75rem;
+	padding-left: 1.25rem;
+	line-height: 1.6;
+}

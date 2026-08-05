@@ -1,0 +1,19 @@
+---
+import AppShell from '../layouts/AppShell.astro';
+---
+
+<AppShell title="Supernote TPX OCR — Test">
+	<Fragment slot="source-panel">
+		<section class="sidebar-section">
+			<h2>Test fixture</h2>
+			<p class="panel-note">
+				Loads <code>rtr.note</code> (from supernote-typescript's own test fixtures) directly, so the
+				rasterize → TPX-recognize pipeline can be exercised without a Supernote plugged in over USB.
+			</p>
+			<button id="load-fixture">Load rtr.note</button>
+			<div id="status">Click "Load rtr.note" to get started.</div>
+		</section>
+	</Fragment>
+
+	<script src="../scripts/test-fixture.ts"></script>
+</AppShell>

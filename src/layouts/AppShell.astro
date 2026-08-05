@@ -1,0 +1,90 @@
+---
+import '../styles/global.css';
+import { DEFAULT_PROMPT } from '../lib/tpx/inference';
+
+export interface Props {
+  title?: string;
+}
+
+const { title = 'Supernote TPX OCR' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+		<link rel="icon" href={`${base}favicon.ico`} />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<script type="module" src={`${base}vendor/supernote-viewer.js`} is:inline></script>
+	</head>
+	<body>
+		<div id="topbar">
+			<button id="menu-toggle" aria-label="Toggle file browser" aria-expanded="true" aria-controls="sidebar">☰</button>
+			<h1>{title}</h1>
+		</div>
+
+		<div id="app">
+			<aside id="sidebar">
+				<section id="tpx-panel" class="sidebar-section">
+					<h2>TPX</h2>
+					<label for="tpx-provider">Provider</label>
+					<input id="tpx-provider" type="url" value="https://api.tokenpony.dev" />
+					<label for="tpx-budget">Budget (USD)</label>
+					<input id="tpx-budget" type="number" min="0.01" step="0.01" value="0.10" />
+					<button id="tpx-connect">Connect TPX</button>
+					<button id="tpx-disconnect" hidden>Disconnect</button>
+					<p id="tpx-status">Not connected.</p>
+
+					<details class="prompt-details">
+						<summary>Recognition prompt</summary>
+						<textarea id="tpx-prompt" rows="6">{DEFAULT_PROMPT}</textarea>
+					</details>
+				</section>
+
+				<slot name="source-panel" />
+			</aside>
+
+			<main id="viewer-pane">
+				<div id="viewer-toolbar">
+					<button id="run-ocr" disabled>Recognize handwriting</button>
+					<span id="ocr-status"></span>
+					<button id="download-txt" hidden>Download .txt</button>
+				</div>
+				<div id="viewer-body">
+					<p id="empty-state">Select a <code>.note</code> file from the menu to preview it here.</p>
+					<supernote-viewer id="viewer" hidden></supernote-viewer>
+					<div id="ocr-result" hidden>
+						<pre id="ocr-text"></pre>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<dialog id="welcome-dialog">
+			<h2>Supernote TPX OCR</h2>
+			<p>
+				Recognize handwriting from your Supernote <code>.note</code> files, entirely in your
+				browser - no app to install, no server of ours in the middle.
+			</p>
+			<ol>
+				<li>Connect your Supernote over USB, or upload a <code>.note</code> file directly.</li>
+				<li>Connect a TPX provider (tokenpony.dev, or one you self-host) to bring your own LLM budget.</li>
+				<li>Run recognition and download the result as text.</li>
+			</ol>
+			<p class="panel-note">
+				Everything runs client-side - your notes and TPX grant go straight to your device and your
+				chosen provider, never through a server we run.
+			</p>
+			<button id="welcome-dismiss">Got it</button>
+		</dialog>
+
+		<script src="../scripts/sidebar-toggle.ts"></script>
+		<script src="../scripts/tpx-login.ts"></script>
+		<script src="../scripts/welcome.ts"></script>
+		<slot />
+		<script src="../scripts/ocr.ts"></script>
+	</body>
+</html>
