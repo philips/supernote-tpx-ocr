@@ -27,6 +27,21 @@ function trimTrailingSlash(url: string): string {
   return url.replace(/\/$/, '');
 }
 
+/**
+ * Pre-registered client_id for this app's own production deployment, per
+ * provider issuer - so every visitor to supernote.ifup.org doesn't silently
+ * self-register a fresh throwaway client with the provider on first
+ * connect. Only used when the current page's redirectUri is one this was
+ * actually registered for; anything else (local dev, a fork, a self-hosted
+ * provider) falls through to dynamic registration below, same as always.
+ */
+const KNOWN_CLIENTS: Record<string, { clientId: string; redirectUris: string[] }> = {
+  'https://api.tokenpony.dev': {
+    clientId: 'app_rX63ae8jZ3Do7RAzbX7Rt_AFlmOTxj3S',
+    redirectUris: ['https://supernote.ifup.org/', 'https://supernote.ifup.org/test/'],
+  },
+};
+
 /** RFC 9728 protected-resource metadata, then RFC 8414 authorization-server metadata; rejects a provider that doesn't advertise the llm-inference grant type. */
 export async function discoverProvider(providerOrigin: string): Promise<DiscoveredProvider> {
   const origin = trimTrailingSlash(providerOrigin);
@@ -47,6 +62,13 @@ export async function discoverProvider(providerOrigin: string): Promise<Discover
 export async function ensureClientId(as: AuthorizationServerMetadata, redirectUri: string): Promise<string> {
   const cached = loadClientId(as.issuer);
   if (cached) return cached;
+
+  const known = KNOWN_CLIENTS[as.issuer];
+  if (known?.redirectUris.includes(redirectUri)) {
+    saveClientId(as.issuer, known.clientId);
+    return known.clientId;
+  }
+
   if (!as.registration_endpoint) {
     throw new Error('provider has no registration_endpoint - it must issue a client_id out of band');
   }
@@ -58,6 +80,7 @@ export async function ensureClientId(as: AuthorizationServerMetadata, redirectUr
       client_name: 'Supernote USB MTP Viewer and AI Handwriting to Text',
       redirect_uris: [redirectUri],
       token_endpoint_auth_method: 'none',
+      grant_types: ['authorization_code', 'refresh_token'],
     }),
   });
   saveClientId(as.issuer, registration.client_id);
