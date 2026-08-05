@@ -5,6 +5,8 @@
 	--muted: #666;
 	--border: #ddd;
 	--accent: #2563eb;
+	--warning: #a15c00;
+	--error: #c0322d;
 	--sidebar-width: 320px;
 }
 
@@ -14,6 +16,8 @@
 		--bg: #14161a;
 		--muted: #9aa0a6;
 		--border: #2a2d33;
+		--warning: #e0a233;
+		--error: #f0605a;
 	}
 }
 
@@ -80,6 +84,32 @@ body {
 	margin-left: calc(-1 * var(--sidebar-width));
 	opacity: 0;
 	pointer-events: none;
+}
+
+#sidebar-tabs {
+	display: flex;
+	gap: 0.25rem;
+	margin-bottom: 1rem;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 0.2rem;
+}
+
+.sidebar-tab {
+	flex: 1;
+	background: none;
+	color: var(--muted);
+	border: 0;
+	border-radius: 6px;
+	padding: 0.4rem 0.6rem;
+	font: inherit;
+	font-size: 0.85rem;
+	cursor: pointer;
+}
+
+.sidebar-tab.active {
+	background: var(--accent);
+	color: #fff;
 }
 
 .sidebar-section {
@@ -238,6 +268,16 @@ td a:hover {
 #ocr-status {
 	color: var(--muted);
 	font-size: 0.9rem;
+}
+
+#ocr-status.status-warning {
+	color: var(--warning);
+	font-weight: 600;
+}
+
+#ocr-status.status-error {
+	color: var(--error);
+	font-weight: 600;
 }
 
 #viewer-body {

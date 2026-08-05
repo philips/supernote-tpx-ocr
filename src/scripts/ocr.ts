@@ -1,7 +1,8 @@
 import { loadGrant, saveGrant, listModels, pickVisionModel, recognizePageText, DEFAULT_PROMPT } from '../lib/tpx';
 import { parseNote, rasterizePageToDataUrl } from '../lib/ocr/rasterize';
 import { NOTE_LOADED_EVENT, type NoteLoadedDetail } from './note-events';
-import { TPX_GRANT_CHANGED_EVENT } from './tpx-events';
+import { setSidebarOpen } from './sidebar-toggle';
+import { dispatchOpenSettings } from './sidebar-tabs';
 
 const runButton = document.getElementById('run-ocr') as HTMLButtonElement;
 const downloadButton = document.getElementById('download-txt') as HTMLButtonElement;
@@ -18,13 +19,28 @@ function baseName(path: string): string {
   return file.replace(/\.note$/i, '');
 }
 
+type StatusLevel = 'info' | 'warning' | 'error';
+
+function setOcrStatus(text: string, level: StatusLevel = 'info'): void {
+  ocrStatusEl.textContent = text;
+  ocrStatusEl.classList.toggle('status-warning', level === 'warning');
+  ocrStatusEl.classList.toggle('status-error', level === 'error');
+}
+
 function updateAvailability(): void {
-  runButton.disabled = running || !currentNote || !loadGrant();
+  runButton.disabled = running || !currentNote;
 }
 
 async function runOcr(): Promise<void> {
+  if (!currentNote) return;
+
   let grant = loadGrant();
-  if (!currentNote || !grant) return;
+  if (!grant) {
+    setSidebarOpen(true);
+    dispatchOpenSettings();
+    setOcrStatus('Connect TPX in Settings first.', 'warning');
+    return;
+  }
 
   running = true;
   updateAvailability();
@@ -35,14 +51,14 @@ async function runOcr(): Promise<void> {
   try {
     const note = parseNote(currentNote.bytes);
     const pageCount = note.pages.length;
-    ocrStatusEl.textContent = 'Loading model list…';
+    setOcrStatus('Loading model list…');
     const models = await listModels(grant.resource);
     const model = pickVisionModel(models, grant.models);
     const prompt = promptEl.value.trim() || DEFAULT_PROMPT;
 
     const pageTexts: string[] = [];
     for (let page = 1; page <= pageCount; page++) {
-      ocrStatusEl.textContent = `Recognizing page ${page} of ${pageCount} (${model})…`;
+      setOcrStatus(`Recognizing page ${page} of ${pageCount} (${model})…`);
       const imageDataUrl = await rasterizePageToDataUrl(note, page);
       const result = await recognizePageText({ grant, model, imageDataUrl, prompt });
       grant = result.grant;
@@ -51,10 +67,10 @@ async function runOcr(): Promise<void> {
       ocrTextEl.textContent = pageTexts.join('\n\n');
     }
 
-    ocrStatusEl.textContent = `Done — ${pageCount} page${pageCount === 1 ? '' : 's'} recognized.`;
+    setOcrStatus(`Done — ${pageCount} page${pageCount === 1 ? '' : 's'} recognized.`);
     downloadButton.hidden = false;
   } catch (err) {
-    ocrStatusEl.textContent = `Recognition failed: ${(err as Error).message}`;
+    setOcrStatus(`Recognition failed: ${(err as Error).message}`, 'error');
   } finally {
     running = false;
     updateAvailability();
@@ -79,10 +95,8 @@ window.addEventListener(NOTE_LOADED_EVENT, (e) => {
   currentNote = (e as CustomEvent<NoteLoadedDetail>).detail;
   ocrResultEl.hidden = true;
   downloadButton.hidden = true;
-  ocrStatusEl.textContent = '';
+  setOcrStatus('');
   updateAvailability();
 });
-
-window.addEventListener(TPX_GRANT_CHANGED_EVENT, updateAvailability);
 
 updateAvailability();
