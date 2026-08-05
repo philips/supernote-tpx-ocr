@@ -55,6 +55,15 @@ TPX grant advertises vision support. "Recognize handwriting" in the viewer
 toolbar runs it page by page and shows the result alongside the note
 preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
 
+## Deployment
+
+Deploys to [supernote.ifup.org](https://supernote.ifup.org) via GitHub Pages
+(`.github/workflows/deploy.yml`, `withastro/action`) on every push to `main`.
+The custom domain is set both in the repo's Pages settings and via
+`public/CNAME`, so it survives even if Pages settings ever get reset.
+`astro.config.mjs`'s `site` matches it; there's no `base` path since this
+domain serves the site from `/`, not a `/supernote-tpx-ocr/` subpath.
+
 ## License
 
 AGPL-3.0-or-later. This project vendors [`mtp-ts`](https://github.com/polvi/yolorepo/tree/main/mtp-ts)

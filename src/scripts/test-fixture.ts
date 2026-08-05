@@ -4,7 +4,7 @@ interface SupernoteViewerElement extends HTMLElement {
   noteData: ArrayBuffer | Uint8Array | null;
 }
 
-const FIXTURE_PATH = '/fixtures/rtr.note';
+const FIXTURE_PATH = `${import.meta.env.BASE_URL}fixtures/rtr.note`;
 const FIXTURE_NAME = 'rtr.note';
 
 const loadButton = document.getElementById('load-fixture') as HTMLButtonElement;
