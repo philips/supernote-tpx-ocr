@@ -8,6 +8,7 @@
 	--warning: #a15c00;
 	--error: #c0322d;
 	--sidebar-width: 320px;
+	--topbar-height: 3.25rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +47,7 @@ body {
 	padding: 0.6rem 1rem;
 	border-bottom: 1px solid var(--border);
 	flex: none;
+	min-height: var(--topbar-height);
 }
 
 #topbar h1 {
@@ -106,6 +108,13 @@ body {
 	margin-left: calc(-1 * var(--sidebar-width));
 	opacity: 0;
 	pointer-events: none;
+}
+
+/* Only ever shown within the mobile breakpoint below - on desktop the
+   sidebar pushes #viewer-pane aside instead of overlaying it, so there's
+   nothing behind it that needs dimming. */
+#sidebar-backdrop {
+	display: none;
 }
 
 #sidebar-tabs {
@@ -264,6 +273,8 @@ td a {
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
+	display: inline-block;
+	padding: 0.2rem 0;
 }
 
 td a:hover {
@@ -282,6 +293,7 @@ td a:hover {
 
 #viewer-toolbar {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.75rem;
 	flex: none;
@@ -391,4 +403,45 @@ td a:hover {
 .noai #viewer-toolbar,
 .noai #ocr-result {
 	display: none !important;
+}
+
+/* Mobile: the sidebar becomes a fixed-position overlay drawer (with a
+   backdrop) instead of pushing #viewer-pane aside - a 320px sidebar next
+   to the note viewer just doesn't fit next to it on a phone-width screen.
+   #app stops being the flex row that gives #sidebar its layout width, so
+   #viewer-pane naturally takes the full width underneath. */
+@media (max-width: 700px) {
+	#topbar h1 {
+		font-size: 0.95rem;
+	}
+
+	#menu-toggle {
+		padding: 0.5rem 0.7rem;
+	}
+
+	#sidebar {
+		position: fixed;
+		top: var(--topbar-height);
+		bottom: 0;
+		left: 0;
+		width: min(var(--sidebar-width), 88vw);
+		z-index: 20;
+		background: var(--bg);
+		box-shadow: 2px 0 16px rgba(0, 0, 0, 0.25);
+	}
+
+	#sidebar-backdrop:not([hidden]) {
+		display: block;
+		position: fixed;
+		top: var(--topbar-height);
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 15;
+		background: rgba(0, 0, 0, 0.4);
+	}
+
+	#viewer-body {
+		flex-direction: column;
+	}
 }

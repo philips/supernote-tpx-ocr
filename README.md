@@ -50,6 +50,14 @@ same `note-loaded` event (`src/scripts/note-events.ts`) that `ocr.ts` listens
 for. `/` and `/test` share `src/layouts/AppShell.astro` (topbar, TPX panel,
 viewer pane); only the sidebar's source panel(s) and loader script(s) differ.
 
+Below 700px wide, the sidebar switches from pushing `#viewer-pane` aside to a
+fixed-position overlay drawer with a backdrop (`#sidebar-backdrop`, tap to
+close) - a 320px sidebar next to the note viewer doesn't fit next to it on a
+phone screen. `src/scripts/sidebar-toggle.ts`'s `setSidebarOpen()` is the one
+place that keeps the drawer, its backdrop, and `#menu-toggle`'s
+`aria-expanded` in sync; the CSS breakpoint in `global.css` is what actually
+turns that same toggle into a push vs. an overlay depending on viewport width.
+
 TPX login (`src/lib/tpx/`, `src/scripts/tpx-login.ts`) implements the
 [TPX v0.3 OAuth profile](https://tokenpony.dev/spec) as a public,
 client-side-only OAuth client: discovery (RFC 9728 + RFC 8414), dynamic
