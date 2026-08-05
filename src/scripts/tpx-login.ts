@@ -12,6 +12,7 @@ import {
 } from '../lib/tpx';
 import { getCurrentNote, loadNoteIntoViewer } from './note-events';
 import { saveNoteForRedirect, takeNoteForRedirect } from './note-cache';
+import { isNoAiMode } from '../lib/noai';
 
 const providerInput = document.getElementById('tpx-provider') as HTMLInputElement;
 const budgetInput = document.getElementById('tpx-budget') as HTMLInputElement;
@@ -111,9 +112,6 @@ async function disconnect(): Promise<void> {
   }
 }
 
-connectButton.addEventListener('click', () => void connect());
-disconnectButton.addEventListener('click', () => void disconnect());
-
 async function init(): Promise<void> {
   const restoredNote = await takeNoteForRedirect();
   if (restoredNote) loadNoteIntoViewer(restoredNote);
@@ -138,4 +136,11 @@ async function init(): Promise<void> {
   }
 }
 
-void init();
+// The Settings tab (and everything in it) is hidden in no-AI mode - skip
+// wiring it up at all, so there's no TPX network activity (discovery,
+// introspection, refresh) even from a hidden/detached control.
+if (!isNoAiMode()) {
+  connectButton.addEventListener('click', () => void connect());
+  disconnectButton.addEventListener('click', () => void disconnect());
+  void init();
+}

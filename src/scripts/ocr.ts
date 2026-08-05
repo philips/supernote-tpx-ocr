@@ -3,6 +3,8 @@ import { parseNote, rasterizePageToDataUrl } from '../lib/ocr/rasterize';
 import { NOTE_LOADED_EVENT, getCurrentNote } from './note-events';
 import { setSidebarOpen } from './sidebar-toggle';
 import { dispatchOpenSettings } from './sidebar-tabs';
+import { downloadBytes } from './download-file';
+import { isNoAiMode } from '../lib/noai';
 
 const runButton = document.getElementById('run-ocr') as HTMLButtonElement;
 const downloadButton = document.getElementById('download-txt') as HTMLButtonElement;
@@ -78,25 +80,23 @@ async function runOcr(): Promise<void> {
 }
 
 function downloadTxt(): void {
-  const text = ocrTextEl.textContent ?? '';
-  const blob = new Blob([text], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
   const currentNote = getCurrentNote();
-  link.download = `${currentNote ? baseName(currentNote.path) : 'note'}-tpx-ocr.txt`;
-  link.click();
-  URL.revokeObjectURL(url);
+  const filename = `${currentNote ? baseName(currentNote.path) : 'note'}-tpx-ocr.txt`;
+  downloadBytes(filename, ocrTextEl.textContent ?? '');
 }
 
-runButton.addEventListener('click', () => void runOcr());
-downloadButton.addEventListener('click', downloadTxt);
+// The OCR toolbar is hidden entirely in no-AI mode - skip wiring it up, so
+// there's no TPX/inference network activity even from a hidden control.
+if (!isNoAiMode()) {
+  runButton.addEventListener('click', () => void runOcr());
+  downloadButton.addEventListener('click', downloadTxt);
 
-window.addEventListener(NOTE_LOADED_EVENT, () => {
-  ocrResultEl.hidden = true;
-  downloadButton.hidden = true;
-  setOcrStatus('');
+  window.addEventListener(NOTE_LOADED_EVENT, () => {
+    ocrResultEl.hidden = true;
+    downloadButton.hidden = true;
+    setOcrStatus('');
+    updateAvailability();
+  });
+
   updateAvailability();
-});
-
-updateAvailability();
+}
