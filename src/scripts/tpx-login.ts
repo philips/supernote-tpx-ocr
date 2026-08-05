@@ -6,7 +6,6 @@ import {
   introspectGrant,
   listModels,
   loadGrant,
-  pickVisionModel,
   revokeGrant,
   saveGrant,
   startAuthorization,
@@ -37,14 +36,12 @@ async function populateModels(grant: StoredGrant): Promise<void> {
   modelSelect.replaceChildren(new Option('Loading models…', ''));
   try {
     const models = await listModels(grant.resource);
-    const pool = grant.models?.length ? models.filter((m) => grant.models?.includes(m.id)) : models;
-    if (pool.length === 0) throw new Error('no models available under this grant');
+    const allowed = grant.models?.length ? models.filter((m) => grant.models?.includes(m.id)) : models;
+    const pool = allowed.filter(supportsVision);
+    if (pool.length === 0) throw new Error('no vision-capable models available under this grant');
 
-    const preferred = pickVisionModel(models, grant.models);
-    modelSelect.replaceChildren(
-      ...pool.map((m) => new Option(m.id + (supportsVision(m) ? ' (vision)' : ''), m.id)),
-    );
-    modelSelect.value = preferred;
+    modelSelect.replaceChildren(...pool.map((m) => new Option(m.id, m.id)));
+    modelSelect.value = pool[0].id;
     modelSelect.disabled = false;
   } catch (err) {
     modelSelect.replaceChildren(new Option('Failed to load models', ''));
