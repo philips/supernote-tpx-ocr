@@ -171,6 +171,7 @@ body {
 }
 
 .sidebar-section input,
+.sidebar-section select,
 .sidebar-section textarea {
 	font: inherit;
 	width: 100%;

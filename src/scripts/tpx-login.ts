@@ -4,10 +4,13 @@ import {
   discoverProvider,
   ensureClientId,
   introspectGrant,
+  listModels,
   loadGrant,
+  pickVisionModel,
   revokeGrant,
   saveGrant,
   startAuthorization,
+  supportsVision,
   type StoredGrant,
 } from '../lib/tpx';
 import { getCurrentNote, loadNoteIntoViewer } from './note-events';
@@ -19,6 +22,7 @@ const budgetInput = document.getElementById('tpx-budget') as HTMLInputElement;
 const connectButton = document.getElementById('tpx-connect') as HTMLButtonElement;
 const disconnectButton = document.getElementById('tpx-disconnect') as HTMLButtonElement;
 const statusEl = document.getElementById('tpx-status') as HTMLElement;
+const modelSelect = document.getElementById('tpx-model') as HTMLSelectElement;
 
 function redirectUri(): string {
   return window.location.origin + window.location.pathname;
@@ -26,6 +30,26 @@ function redirectUri(): string {
 
 function formatUsd(amount: number): string {
   return `$${amount.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}`;
+}
+
+async function populateModels(grant: StoredGrant): Promise<void> {
+  modelSelect.disabled = true;
+  modelSelect.replaceChildren(new Option('Loading models…', ''));
+  try {
+    const models = await listModels(grant.resource);
+    const pool = grant.models?.length ? models.filter((m) => grant.models?.includes(m.id)) : models;
+    if (pool.length === 0) throw new Error('no models available under this grant');
+
+    const preferred = pickVisionModel(models, grant.models);
+    modelSelect.replaceChildren(
+      ...pool.map((m) => new Option(m.id + (supportsVision(m) ? ' (vision)' : ''), m.id)),
+    );
+    modelSelect.value = preferred;
+    modelSelect.disabled = false;
+  } catch (err) {
+    modelSelect.replaceChildren(new Option('Failed to load models', ''));
+    console.warn('tpx: failed to list models', err);
+  }
 }
 
 function renderConnected(grant: StoredGrant, remaining?: number): void {
@@ -37,6 +61,7 @@ function renderConnected(grant: StoredGrant, remaining?: number): void {
     ? formatUsd(grant.budget)
     : `${formatUsd(remaining)} of ${formatUsd(grant.budget)}`;
   statusEl.textContent = `Connected to ${new URL(grant.issuer).host} — ${budgetText} remaining`;
+  void populateModels(grant);
 }
 
 function renderDisconnected(message = 'Not connected.'): void {
@@ -46,6 +71,8 @@ function renderDisconnected(message = 'Not connected.'): void {
   budgetInput.disabled = false;
   disconnectButton.hidden = true;
   statusEl.textContent = message;
+  modelSelect.disabled = true;
+  modelSelect.replaceChildren(new Option('Connect to see available models', ''));
 }
 
 async function refreshStatus(grant: StoredGrant): Promise<void> {
