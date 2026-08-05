@@ -12,7 +12,7 @@ Enrich and improve your Supernote handwriting recognition without installing any
 ## Roadmap
 
 - [x] Web based file browser of Supernote device using supernote viewer web component and mtp-ts
-- [ ] TPX login for users to access their LLM
+- [x] TPX login for users to access their LLM
 - [ ] Rasterizes .note files, uploads to LLM with prompt to recognize handwriting, and writes recognized text back to a new note named <orig>-tpx-ocr.note with https://github.com/philips/supernote-typescript and uploaded to device over MTP
 
 ## Development
@@ -25,6 +25,15 @@ bun run build   # static build to dist/
 
 The device file browser (`src/pages/index.astro`, `src/scripts/device-browser.ts`)
 needs a Chromium-based browser (WebUSB) and a Supernote plugged in over USB.
+
+TPX login (`src/lib/tpx/`, `src/scripts/tpx-login.ts`) implements the
+[TPX v0.3 OAuth profile](https://tokenpony.dev/spec) as a public,
+client-side-only OAuth client: discovery (RFC 9728 + RFC 8414), dynamic
+client registration (RFC 7591, cached per provider in `localStorage`), a
+PAR + PKCE(S256) authorization request, code exchange, and rotating-refresh
+handling. The sidebar's "TPX" panel lets you point at any provider that
+advertises the `llm-inference` grant type — tokenpony.dev by default, or a
+self-hosted one.
 
 ## License
 
