@@ -65,6 +65,28 @@ body {
 	cursor: pointer;
 }
 
+#app-footer {
+	flex: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border-top: 1px solid var(--border);
+	font-size: 0.8rem;
+	color: var(--muted);
+}
+
+#app-footer a {
+	color: var(--muted);
+	text-decoration: none;
+}
+
+#app-footer a:hover {
+	color: var(--accent);
+	text-decoration: underline;
+}
+
 #app {
 	flex: 1;
 	display: flex;
