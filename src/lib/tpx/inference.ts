@@ -30,14 +30,6 @@ export function supportsVision(model: ModelInfo): boolean {
   return VISION_HINT.test(model.description ?? '');
 }
 
-/** Picks a model whose description advertises vision support, preferring one within the grant's model restriction (if any); falls back to the first available model if none is flagged. */
-export function pickVisionModel(models: ModelInfo[], allowed?: string[]): string {
-  const pool = allowed?.length ? models.filter((m) => allowed.includes(m.id)) : models;
-  if (pool.length === 0) throw new Error('no models available under this TPX grant');
-  const vision = pool.find(supportsVision);
-  return (vision ?? pool[0]).id;
-}
-
 export interface RecognizeResult {
   text: string;
   /** Possibly refreshed - callers should persist this in place of the grant they passed in. */
