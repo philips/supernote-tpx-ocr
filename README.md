@@ -14,7 +14,8 @@ Enrich and improve your Supernote handwriting recognition without installing any
 - [x] Web based file browser of Supernote device using supernote viewer web component and mtp-ts
 - [x] TPX login for users to access their LLM
 - [x] Rasterizes .note files and uploads to LLM with a prompt to recognize handwriting; recognized text is shown in the browser and downloadable as a .txt file
-- [ ] Writes recognized text back to a new note named <orig>-tpx-ocr.note with https://github.com/philips/supernote-typescript and uploads it to the device over MTP
+- [ ] Writes recognized text back to a new note named <orig>-tpx-ocr.note with https://github.com/philips/supernote-typescript and uploads it to the device over MTP -
+      still blocked on `supernote-typescript` having no `.note` write/serialize support at all (read/rasterize/PDF only); in the meantime, AI-recognized text can be embedded into a downloadable PDF instead (see "AI-text PDF export" below), and the original `.note` can be downloaded unmodified via "Download .note"
 
 ## Development
 
@@ -134,7 +135,29 @@ was written, so the PDF comes out searchable/selectable in a PDF viewer with
 no extra work here. Also no TPX/AI involved, so it stays available in no-AI
 mode too. Downloads as `<orig>.pdf` via `downloadBytes()` directly - `toPdf`
 already returns raw `Uint8Array` bytes, not a `data:` URL, so no decoding
-step is needed the way the PNG export above needs one.
+step is needed the way the PNG export above needs one. Also in this section,
+"Download .note" (`src/scripts/export-note.ts`) downloads the currently
+loaded note's original, unmodified bytes as `<orig>.note` - `supernote-typescript`
+has no `.note` write/serialize support (parse/rasterize/PDF only), so this is
+a plain copy, not a note with AI-recognized text embedded back into it.
+
+Back in "AI Recognition" (`src/scripts/ocr.ts`), "Download as PDF (AI Text)"
+appears once a recognition run finishes, and embeds *that* run's text into a
+PDF instead of the note's own on-device RTR data - `buildAiTextPdf()`
+(`src/lib/ocr/pdf.ts`) calls the same `createPdfContext()`/`addPdfPage()`
+`toPdf()` itself is built from, but with each page's `recognitionElements`
+swapped out for one built from the AI's plain-text result instead of the
+note's own parsed recognition data. AI OCR has no word-level bounding boxes
+(only text, one block per page) to draw the invisible layer at real ink
+positions the way genuine RTR data lets `toPdf()` do; splitting on the
+line breaks `DEFAULT_PROMPT` asks the model to preserve, and giving each
+line its own full-width box, is a deliberate middle ground - not word-level
+positioning, but enough that the per-word font size/horizontal-squeeze
+`addPdfPage()`'s invisible-text layer applies stays close to a real line
+of writing, rather than needing to cram a whole page's text into one box
+sized to the whole page (which was tried first and squeezes space
+characters down to sub-visible width, making search fail on any query
+with more than one word). Downloads as `<orig>-tpx-ocr.pdf`.
 
 Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
 redirects to `/`; every page checks it via a synchronous inline script in
