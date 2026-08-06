@@ -126,6 +126,16 @@ rasterized `data:` URL to decode it into a real `Blob` before saving -
 `downloadBytes()`'s plain `Blob([data])` would otherwise save the URL string
 itself rather than the image it points to.
 
+The same section's "Download as PDF" (`src/scripts/export-pdf.ts`) exports
+the whole note via `supernote-typescript`'s own `toPdf()` - already a direct
+dependency of this project - which rasterizes every page and draws each
+page's recognized handwriting (RTR) text invisibly on top at the position it
+was written, so the PDF comes out searchable/selectable in a PDF viewer with
+no extra work here. Also no TPX/AI involved, so it stays available in no-AI
+mode too. Downloads as `<orig>.pdf` via `downloadBytes()` directly - `toPdf`
+already returns raw `Uint8Array` bytes, not a `data:` URL, so no decoding
+step is needed the way the PNG export above needs one.
+
 Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
 redirects to `/`; every page checks it via a synchronous inline script in
 `<head>` (`src/layouts/AppShell.astro`, before first paint, so there's no

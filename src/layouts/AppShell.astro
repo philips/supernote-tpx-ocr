@@ -56,6 +56,8 @@ const base = import.meta.env.BASE_URL;
 						<h2>Export</h2>
 						<button id="download-page-png" disabled>Download Current Page as PNG</button>
 						<p id="page-png-status"></p>
+						<button id="download-pdf" disabled>Download as PDF</button>
+						<p id="pdf-status"></p>
 					</section>
 				</div>
 
@@ -132,6 +134,7 @@ const base = import.meta.env.BASE_URL;
 		<script src="../scripts/welcome.ts"></script>
 		<slot />
 		<script src="../scripts/export-png.ts"></script>
+		<script src="../scripts/export-pdf.ts"></script>
 		<script src="../scripts/ocr.ts"></script>
 	</body>
 </html>
