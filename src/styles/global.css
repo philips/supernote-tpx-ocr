@@ -219,20 +219,23 @@ body {
 
 #tpx-status,
 #ocr-status,
-#page-png-status {
+#page-png-status,
+#pdf-status {
 	color: var(--muted);
 	font-size: 0.9rem;
 	margin: 0.6rem 0 0;
 }
 
 #ocr-status.status-warning,
-#page-png-status.status-warning {
+#page-png-status.status-warning,
+#pdf-status.status-warning {
 	color: var(--warning);
 	font-weight: 600;
 }
 
 #ocr-status.status-error,
-#page-png-status.status-error {
+#page-png-status.status-error,
+#pdf-status.status-error {
 	color: var(--error);
 	font-weight: 600;
 }
