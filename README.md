@@ -46,9 +46,22 @@ needed (this one only loads into the browser - it doesn't write to a device).
 test fixture (`public/fixtures/rtr.note`, from `supernote-typescript`'s own
 test suite) instead of a user-picked file, for trying the rasterize →
 TPX-recognize flow without a Supernote on hand. All three sources feed the
-same `note-loaded` event (`src/scripts/note-events.ts`) that `ocr.ts` listens
-for. `/` and `/test` share `src/layouts/AppShell.astro` (topbar, TPX panel,
-viewer pane); only the sidebar's source panel(s) and loader script(s) differ.
+same `note-loaded` event (`src/scripts/note-events.ts`) that `ocr.ts`
+listens for. `/` and `/test` share `src/layouts/AppShell.astro` (topbar,
+sidebar tabs, viewer pane); only the Browse tab's source panel(s) and
+loader script(s) differ.
+
+The sidebar (`src/scripts/sidebar-tabs.ts`) has three tabs, in order:
+Browse (the source panel(s) above), Convert - the "Convert Handwriting to
+Text with AI" control, described next - and Settings (the TPX panel,
+below). Switching tabs just toggles which `.sidebar-panel` is `hidden`;
+`showSettingsTab()`/`dispatchOpenSettings()` let other scripts (`ocr.ts`,
+when TPX isn't connected yet) jump the sidebar to Settings without
+importing its DOM internals.
+
+(The Supernote's own on-device handwriting recognition - what Supernote
+calls "RTR" - is already exposed by the `<supernote-viewer>` web
+component's own toolbar, so this app doesn't duplicate it.)
 
 Below 700px wide, the sidebar switches from pushing `#viewer-pane` aside to a
 fixed-position overlay drawer with a backdrop (`#sidebar-backdrop`, tap to
@@ -95,6 +108,11 @@ tokenpony.dev today that leaves exactly one model). "Convert Handwriting to
 Text with AI" in the viewer toolbar runs recognition page by page against
 whichever model is currently selected and shows the result alongside the
 note preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
+  
+Since this whole pipeline needs TPX, the Convert tab is AI-specific end to
+end - in no-AI mode it's hidden along with the Settings tab (nothing to
+configure without AI), leaving only Browse (`#sidebar-tabs`, `#convert-panel`,
+`#settings-panel`, and the `#ocr-result` panel in `global.css`).
 
 Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
 redirects to `/`; every page checks it via a synchronous inline script in
