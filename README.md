@@ -105,14 +105,26 @@ grant's own model restriction (if it has one) and then to vision-capable
 models only (`supportsVision()` - a text match against the provider's own
 `description` field, so it's only as good as that description; on
 tokenpony.dev today that leaves exactly one model). "Convert Handwriting to
-Text with AI" in the viewer toolbar runs recognition page by page against
-whichever model is currently selected and shows the result alongside the
-note preview; "Download .txt" saves it locally as `<orig>-tpx-ocr.txt`.
-  
-Since this whole pipeline needs TPX, the Convert tab is AI-specific end to
-end - in no-AI mode it's hidden along with the Settings tab (nothing to
-configure without AI), leaving only Browse (`#sidebar-tabs`, `#convert-panel`,
-`#settings-panel`, and the `#ocr-result` panel in `global.css`).
+Text with AI", in the Convert tab's "AI Recognition" section, runs
+recognition page by page against whichever model is currently selected and
+shows the result alongside the note preview; "Download .txt" saves it
+locally as `<orig>-tpx-ocr.txt`. Since this needs TPX, "AI Recognition" and
+the AI result panel are marked `.ai-only` and hidden in no-AI mode, same as
+the Settings tab.
+
+The Convert tab's other section, "Export" (`src/scripts/export-png.ts`), has
+"Download Current Page as PNG" - a local rasterize-and-download of whichever
+page is currently on screen, using the same `rasterizePageToDataUrl()` the
+AI flow above does, so no TPX/AI involved and it stays available in no-AI
+mode. "Currently on screen" comes from `<supernote-viewer>`'s own
+`currentPage` property (1-indexed, kept in sync with scroll position, 0
+before a note's finished loading - mirrors how the upstream Obsidian plugin's
+own "export current page" command reads the same property rather than
+tracking scroll position itself). Downloads as `<orig>-page-<N>.png` via
+`downloadDataUrl()` (`src/scripts/download-file.ts`), which `fetch()`s the
+rasterized `data:` URL to decode it into a real `Blob` before saving -
+`downloadBytes()`'s plain `Blob([data])` would otherwise save the URL string
+itself rather than the image it points to.
 
 Visiting `/noai` (linked from the footer) sets a `localStorage` flag and
 redirects to `/`; every page checks it via a synchronous inline script in
