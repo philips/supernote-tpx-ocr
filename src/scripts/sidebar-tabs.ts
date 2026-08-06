@@ -1,26 +1,33 @@
-const tabBrowse = document.getElementById('tab-browse') as HTMLButtonElement;
-const tabSettings = document.getElementById('tab-settings') as HTMLButtonElement;
-const browsePanel = document.getElementById('browse-panel') as HTMLElement;
-const settingsPanel = document.getElementById('settings-panel') as HTMLElement;
+interface Tab {
+  button: HTMLButtonElement;
+  panel: HTMLElement;
+}
+
+function getTab(buttonId: string, panelId: string): Tab {
+  return {
+    button: document.getElementById(buttonId) as HTMLButtonElement,
+    panel: document.getElementById(panelId) as HTMLElement,
+  };
+}
+
+const browseTab = getTab('tab-browse', 'browse-panel');
+const settingsTab = getTab('tab-settings', 'settings-panel');
+const convertTab = getTab('tab-convert', 'convert-panel');
+const tabs = [browseTab, settingsTab, convertTab];
 
 export const OPEN_SETTINGS_EVENT = 'supernote-tpx:open-settings';
 
-export function showSettingsTab(): void {
-  browsePanel.hidden = true;
-  settingsPanel.hidden = false;
-  tabBrowse.classList.remove('active');
-  tabSettings.classList.add('active');
-  tabBrowse.setAttribute('aria-selected', 'false');
-  tabSettings.setAttribute('aria-selected', 'true');
+function showTab(active: Tab): void {
+  for (const tab of tabs) {
+    const isActive = tab === active;
+    tab.panel.hidden = !isActive;
+    tab.button.classList.toggle('active', isActive);
+    tab.button.setAttribute('aria-selected', String(isActive));
+  }
 }
 
-function showBrowseTab(): void {
-  browsePanel.hidden = false;
-  settingsPanel.hidden = true;
-  tabBrowse.classList.add('active');
-  tabSettings.classList.remove('active');
-  tabBrowse.setAttribute('aria-selected', 'true');
-  tabSettings.setAttribute('aria-selected', 'false');
+export function showSettingsTab(): void {
+  showTab(settingsTab);
 }
 
 /** Lets other scripts (e.g. ocr.ts, when TPX isn't connected yet) switch the sidebar to Settings without importing DOM internals. */
@@ -28,8 +35,9 @@ export function dispatchOpenSettings(): void {
   window.dispatchEvent(new Event(OPEN_SETTINGS_EVENT));
 }
 
-tabBrowse.addEventListener('click', showBrowseTab);
-tabSettings.addEventListener('click', showSettingsTab);
+for (const tab of tabs) {
+  tab.button.addEventListener('click', () => showTab(tab));
+}
 window.addEventListener(OPEN_SETTINGS_EVENT, showSettingsTab);
 
-showBrowseTab();
+showTab(browseTab);

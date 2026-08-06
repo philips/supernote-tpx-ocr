@@ -217,10 +217,21 @@ body {
 	width: 100%;
 }
 
-#tpx-status {
+#tpx-status,
+#ocr-status {
 	color: var(--muted);
 	font-size: 0.9rem;
 	margin: 0.6rem 0 0;
+}
+
+#ocr-status.status-warning {
+	color: var(--warning);
+	font-weight: 600;
+}
+
+#ocr-status.status-error {
+	color: var(--error);
+	font-weight: 600;
 }
 
 #toolbar {
@@ -290,33 +301,6 @@ td a:hover {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-}
-
-#viewer-toolbar {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.75rem;
-	flex: none;
-}
-
-#viewer-toolbar button {
-	width: auto;
-}
-
-#ocr-status {
-	color: var(--muted);
-	font-size: 0.9rem;
-}
-
-#ocr-status.status-warning {
-	color: var(--warning);
-	font-weight: 600;
-}
-
-#ocr-status.status-error {
-	color: var(--error);
-	font-weight: 600;
 }
 
 #viewer-body {
@@ -398,10 +382,13 @@ td a:hover {
    TPX/OCR UI) whenever localStorage's noai flag is set. The matching
    scripts (tpx-login.ts, ocr.ts) skip wiring themselves up entirely in
    this mode, not just hiding these elements - see isNoAiMode() in
-   src/scripts/noai.ts. */
+   src/scripts/noai.ts. Both the Convert tab (AI handwriting recognition)
+   and the Settings tab (nothing to configure without AI) are AI-specific,
+   which leaves only Browse - so the whole tab bar goes too and
+   browse-panel's content (not itself a tab target) is all there is to see. */
 .noai #sidebar-tabs,
+.noai #convert-panel,
 .noai #settings-panel,
-.noai #viewer-toolbar,
 .noai #ocr-result {
 	display: none !important;
 }

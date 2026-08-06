@@ -36,11 +36,21 @@ const base = import.meta.env.BASE_URL;
 			<aside id="sidebar">
 				<div id="sidebar-tabs" role="tablist">
 					<button id="tab-browse" class="sidebar-tab" role="tab" aria-selected="true" aria-controls="browse-panel">Browse</button>
+					<button id="tab-convert" class="sidebar-tab" role="tab" aria-selected="false" aria-controls="convert-panel">Convert</button>
 					<button id="tab-settings" class="sidebar-tab" role="tab" aria-selected="false" aria-controls="settings-panel">Settings</button>
 				</div>
 
 				<div id="browse-panel" class="sidebar-panel" role="tabpanel">
 					<slot name="source-panel" />
+				</div>
+
+				<div id="convert-panel" class="sidebar-panel" role="tabpanel" hidden>
+					<section class="sidebar-section">
+						<h2>AI Recognition</h2>
+						<button id="run-ocr" disabled>Convert Handwriting to Text with AI</button>
+						<p id="ocr-status"></p>
+						<button id="download-txt" hidden>Download .txt</button>
+					</section>
 				</div>
 
 				<div id="settings-panel" class="sidebar-panel" role="tabpanel" hidden>
@@ -73,11 +83,6 @@ const base = import.meta.env.BASE_URL;
 			<div id="sidebar-backdrop" hidden></div>
 
 			<main id="viewer-pane">
-				<div id="viewer-toolbar">
-					<button id="run-ocr" disabled>Convert Handwriting to Text with AI</button>
-					<span id="ocr-status"></span>
-					<button id="download-txt" hidden>Download .txt</button>
-				</div>
 				<div id="viewer-body">
 					<p id="empty-state">Select a <code>.note</code> file from the menu to preview it here.</p>
 					<supernote-viewer id="viewer" hidden></supernote-viewer>
