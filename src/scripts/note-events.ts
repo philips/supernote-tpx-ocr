@@ -7,6 +7,8 @@ export interface NoteLoadedDetail {
 
 export interface SupernoteViewerElement extends HTMLElement {
   noteData: ArrayBuffer | Uint8Array | null;
+  /** 1-indexed page currently on screen (scroll-driven), 0 before a note has loaded. */
+  readonly currentPage: number;
 }
 
 let current: NoteLoadedDetail | null = null;

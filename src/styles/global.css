@@ -218,18 +218,21 @@ body {
 }
 
 #tpx-status,
-#ocr-status {
+#ocr-status,
+#page-png-status {
 	color: var(--muted);
 	font-size: 0.9rem;
 	margin: 0.6rem 0 0;
 }
 
-#ocr-status.status-warning {
+#ocr-status.status-warning,
+#page-png-status.status-warning {
 	color: var(--warning);
 	font-weight: 600;
 }
 
-#ocr-status.status-error {
+#ocr-status.status-error,
+#page-png-status.status-error {
 	color: var(--error);
 	font-weight: 600;
 }
@@ -382,14 +385,14 @@ td a:hover {
    TPX/OCR UI) whenever localStorage's noai flag is set. The matching
    scripts (tpx-login.ts, ocr.ts) skip wiring themselves up entirely in
    this mode, not just hiding these elements - see isNoAiMode() in
-   src/scripts/noai.ts. Both the Convert tab (AI handwriting recognition)
-   and the Settings tab (nothing to configure without AI) are AI-specific,
-   which leaves only Browse - so the whole tab bar goes too and
-   browse-panel's content (not itself a tab target) is all there is to see. */
-.noai #sidebar-tabs,
-.noai #convert-panel,
+   src/scripts/noai.ts. The Convert tab's "Export" section (PNG export,
+   export-png.ts) is a local rasterize-and-download, no AI/TPX involved,
+   so the Convert tab itself stays reachable - only its "AI Recognition"
+   section and the Settings tab (nothing to configure without AI) are
+   AI-specific and get hidden. */
+.noai #tab-settings,
 .noai #settings-panel,
-.noai #ocr-result {
+.noai .ai-only {
 	display: none !important;
 }
 
