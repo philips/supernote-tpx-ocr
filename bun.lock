@@ -7,7 +7,7 @@
       "dependencies": {
         "astro": "^7.1.6",
         "image-js": "^1.7.0",
-        "supernote-typescript": "^0.5.3",
+        "supernote-typescript": "^0.7.1",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.10",
@@ -915,7 +915,7 @@
 
     "strip-ansi": ["strip-ansi@7.2.0", "", { "dependencies": { "ansi-regex": "^6.2.2" } }, "sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w=="],
 
-    "supernote-typescript": ["supernote-typescript@0.5.3", "", { "dependencies": { "@pdf-lib/fontkit": "^1.1.1", "color": "^5.0.3", "fs-extra": "^11.4.0", "image-js": "^1.7.0", "pdf-lib": "^1.17.1", "sql.js": "^1.14.1" } }, "sha512-wgvJWpRp/EFAXNIqKfxQm7FtNcA3LE8Hc3kMI6New5xqmbirDYczf9UwNk6RBzxt2opyEw6RW5Yl25o2F6lsVA=="],
+    "supernote-typescript": ["supernote-typescript@0.7.1", "", { "dependencies": { "@pdf-lib/fontkit": "^1.1.1", "color": "^5.0.3", "fs-extra": "^11.4.0", "image-js": "^1.7.0", "pdf-lib": "^1.17.1", "sql.js": "^1.14.1" } }, "sha512-0rDUBf5h+8cJm6Cqb/O9fpD62/Kg10i49XxgwjCMnWma/eR+yKO0NYDz6ejfKQa3U6bOD4eUHXC7g4KESQIpDA=="],
 
     "svgo": ["svgo@4.0.2", "", { "dependencies": { "commander": "^11.1.0", "css-select": "^5.1.0", "css-tree": "^3.0.1", "css-what": "^6.1.0", "csso": "^5.0.5", "picocolors": "^1.1.1", "sax": "^1.5.0" }, "bin": "./bin/svgo.js" }, "sha512-ekx94z1rRc5LDi6oSUaeRnYhd0UOJxdtQCL2rF8xpWxD3TPAsISWOrxezqGovqS38GRZOdpDfvQe3ts6F7nsng=="],
 
