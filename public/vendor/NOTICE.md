@@ -1,14 +1,20 @@
 # supernote-viewer.js (vendored, built)
 
 Built from [`philips/supernote-obsidian-plugin`](https://github.com/philips/supernote-obsidian-plugin)
-at commit [`f070393`](https://github.com/philips/supernote-obsidian-plugin/commit/f070393eff823609eda61e9c8f2a43e61f093608),
-plus [PR #211](https://github.com/philips/supernote-obsidian-plugin/pull/211)
-(commit [`4c9571c`](https://github.com/philips/supernote-obsidian-plugin/commit/4c9571c641bd496f76271deec8edb4ff9e782c2f),
-"Draw text-view toolbar icon as a letter A, not three lines") cherry-picked on
-top - `main` had moved further ahead with unrelated features (a new
-`<supernote-atelier-viewer>` component, page-cache tuning) not worth pulling
-in for one icon fix, so this base commit + one cherry-pick keeps the vendored
-diff minimal and easy to reason about. Built via `npm run build:webcomponent`,
+at commit [`e767c8c`](https://github.com/philips/supernote-obsidian-plugin/commit/e767c8c9445bdf064ad71f3d0841f66ef13373a7)
+(merge of [PR #220](https://github.com/philips/supernote-obsidian-plugin/pull/220),
+"Fix word-overlay and export text-layer alignment on N6/A6X"). This is the
+latest `main` HEAD; it supersedes the previous vendored copy, which was pinned
+at `f070393` plus a cherry-pick of [PR #211](https://github.com/philips/supernote-obsidian-plugin/pull/211)
+(the text-view toolbar icon redraw) because `main` had then moved further ahead
+with unrelated features (a new `<supernote-atelier-viewer>` component,
+page-cache tuning) not worth pulling in for one icon fix. Since then those
+features plus useful fixes have landed - notably the icon fix from PR #211
+(merged at `eecfa89`), [PR #214](https://github.com/philips/supernote-obsidian-plugin/pull/214)
+SVG page export, [PR #217](https://github.com/philips/supernote-obsidian-plugin/pull/217)
+vector-ink support, and [PR #219](https://github.com/philips/supernote-obsidian-plugin/pull/219)
+N6/A6X word-overlay alignment - so the whole `main` tip is now pulled in
+rather than a minimal cherry-pick. Built via `npm run build:webcomponent`,
 per that repo's `webcomponent-usage.md` (the `<supernote-viewer>` element
 isn't published anywhere yet, so consumers are told to self-host a built
 copy).
