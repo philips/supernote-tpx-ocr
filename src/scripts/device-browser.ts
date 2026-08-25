@@ -6,6 +6,7 @@ import {
   MtpFs,
   type MtpDevice,
   type ObjectInfo,
+  type StorageInfo,
 } from '../lib/mtp-ts';
 import { loadNoteIntoViewer } from './note-events';
 import { downloadBytes } from './download-file';
@@ -15,6 +16,7 @@ const statusEl = document.getElementById('status') as HTMLElement;
 const crumbsEl = document.getElementById('crumbs') as HTMLElement;
 const listingEl = document.getElementById('listing') as HTMLElement;
 const uploadInput = document.getElementById('device-upload') as HTMLInputElement;
+const storageSelect = document.getElementById('device-storage') as HTMLSelectElement;
 
 let mtp: MtpDevice | null = null;
 let fs: MtpFs | null = null;
@@ -22,6 +24,37 @@ let path = '';
 
 function setStatus(message: string): void {
   statusEl.textContent = message;
+}
+
+function storageName(storage: StorageInfo): string {
+  const name = [storage.description, storage.volumeLabel].filter(Boolean).join(' — ');
+  return name || `Storage 0x${storage.id.toString(16).padStart(8, '0')}`;
+}
+
+function populateStorageSelect(storages: StorageInfo[]): number {
+  storageSelect.replaceChildren();
+  for (const storage of storages) {
+    const option = document.createElement('option');
+    option.value = String(storage.id);
+    option.textContent = storageName(storage);
+    storageSelect.append(option);
+  }
+  storageSelect.disabled = false;
+
+  // Android normally calls its /sdcard-backed MTP store "Internal shared
+  // storage". Prefer it, but retain every store in the selector.
+  const preferred = storages.find((storage) => /\b(internal|shared)\b/i.test(
+    `${storage.description} ${storage.volumeLabel}`,
+  )) ?? storages[0];
+  storageSelect.value = String(preferred.id);
+  return preferred.id;
+}
+
+async function selectStorage(storageId: number): Promise<void> {
+  if (!mtp) return;
+  fs = new MtpFs(mtp, storageId);
+  path = '';
+  await navigate('');
 }
 
 function renderCrumbs(): void {
@@ -184,15 +217,17 @@ async function connect(): Promise<void> {
   try {
     const device = await requestMtpDevice();
     setStatus('Opening MTP session…');
-    mtp = await connectMtp(device);
+    const connectedMtp = await connectMtp(device);
+    mtp = connectedMtp;
 
-    const storageIds = mountedStorageIds(await mtp.getStorageIDs());
+    const storageIds = mountedStorageIds(await connectedMtp.getStorageIDs());
     if (storageIds.length === 0) throw new Error('no mounted storage found on device');
+    const storages = await Promise.all(storageIds.map((id) => connectedMtp.getStorageInfo(id)));
 
-    fs = new MtpFs(mtp, storageIds[0]);
+    const storageId = populateStorageSelect(storages);
     connectButton.textContent = 'Connected';
     uploadInput.disabled = false;
-    await navigate('');
+    await selectStorage(storageId);
   } catch (err) {
     setStatus(`Connection failed: ${(err as Error).message}`);
     connectButton.disabled = false;
@@ -200,6 +235,10 @@ async function connect(): Promise<void> {
 }
 
 connectButton.addEventListener('click', () => void connect());
+storageSelect.addEventListener('change', () => {
+  const storageId = Number(storageSelect.value);
+  if (Number.isInteger(storageId)) void selectStorage(storageId);
+});
 uploadInput.addEventListener('change', () => {
   const file = uploadInput.files?.[0];
   if (file) void uploadToDevice(file);
