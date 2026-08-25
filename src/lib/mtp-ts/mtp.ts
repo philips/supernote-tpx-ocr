@@ -40,6 +40,10 @@ export const RC_NAMES: Record<number, string> = {
 export const FMT_ASSOCIATION = 0x3001; // folder
 export const ROOT_PARENT = 0xffffffff;
 
+// Chromium limits an individual WebUSB transferOut() buffer to 32 MiB. MTP
+// containers are a byte stream, so a data container may span many transfers.
+const TRANSFER_OUT_CHUNK_SIZE = 1 << 20;
+
 const EXT_FORMATS: Record<string, number> = {
   txt: 0x3004, html: 0x3005, htm: 0x3005, wav: 0x3008, mp3: 0x3009,
   avi: 0x300a, mpg: 0x300b, jpg: 0x3801, jpeg: 0x3801, gif: 0x3807,
@@ -268,6 +272,32 @@ export class MtpDevice {
     return buf;
   }
 
+  private async transferDataContainer(code: number, tid: number, payload: Uint8Array): Promise<void> {
+    const length = 12 + payload.byteLength;
+    if (length > 0xffffffff) throw new Error('MTP data container exceeds 4 GiB limit');
+
+    // Put the header in the first chunk, then continue the same MTP container
+    // across small bulk transfers. There must be no command between chunks.
+    const firstPayloadLength = Math.min(payload.byteLength, TRANSFER_OUT_CHUNK_SIZE - 12);
+    const firstChunk = new Uint8Array(12 + firstPayloadLength);
+    const dv = new DataView(firstChunk.buffer);
+    dv.setUint32(0, length, true);
+    dv.setUint16(4, CONTAINER.DATA, true);
+    dv.setUint16(6, code, true);
+    dv.setUint32(8, tid, true);
+    firstChunk.set(payload.subarray(0, firstPayloadLength), 12);
+    await this.device.transferOut(this.epOut, firstChunk);
+
+    for (let offset = firstPayloadLength; offset < payload.byteLength; offset += TRANSFER_OUT_CHUNK_SIZE) {
+      const end = Math.min(offset + TRANSFER_OUT_CHUNK_SIZE, payload.byteLength);
+      // Copy so the BufferSource is backed by an ArrayBuffer, rather than a
+      // possibly SharedArrayBuffer-backed view.
+      const chunk = new Uint8Array(end - offset);
+      chunk.set(payload.subarray(offset, end));
+      await this.device.transferOut(this.epOut, chunk);
+    }
+  }
+
   private async transferIn(len: number): Promise<Uint8Array> {
     let r = await this.device.transferIn(this.epIn, len);
     if (r.status === 'stall') {
@@ -309,16 +339,7 @@ export class MtpDevice {
   async transaction(op: number, params: number[] = [], dataOut: Uint8Array | null = null): Promise<TransactionResult> {
     const tid = this.tid++;
     await this.device.transferOut(this.epOut, this.buildCommand(op, tid, params));
-    if (dataOut) {
-      const buf = new Uint8Array(12 + dataOut.byteLength);
-      const dv = new DataView(buf.buffer);
-      dv.setUint32(0, buf.byteLength, true);
-      dv.setUint16(4, CONTAINER.DATA, true);
-      dv.setUint16(6, op, true);
-      dv.setUint32(8, tid, true);
-      buf.set(dataOut, 12);
-      await this.device.transferOut(this.epOut, buf);
-    }
+    if (dataOut) await this.transferDataContainer(op, tid, dataOut);
     let data: Uint8Array | null = null;
     let c = await this.readContainer();
     if (c.type === CONTAINER.DATA) {
